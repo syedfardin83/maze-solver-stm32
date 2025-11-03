@@ -33,7 +33,6 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 int count = 0;
-bool a = false;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
