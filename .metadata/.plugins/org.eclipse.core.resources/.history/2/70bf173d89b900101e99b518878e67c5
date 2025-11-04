@@ -320,69 +320,6 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
     }
 }
 
-void update_adjacents(struct Maze* maze,struct Maze* sim_maze){
-    if (maze->orient == 'N')
-    {
-        maze->left_cell[0] = maze->curr_cell[0] - 1;
-        maze->left_cell[1] = maze->curr_cell[1];
-
-        maze->right_cell[0] = maze->curr_cell[0] + 1;
-        maze->right_cell[1] = maze->curr_cell[1];
-
-        maze->front_cell[0] = maze->curr_cell[0];
-        maze->front_cell[1] = maze->curr_cell[1] + 1;
-
-        maze->back_cell[0] = maze->curr_cell[0];
-        maze->back_cell[1] = maze->curr_cell[1] - 1;
-    }
-    else if (maze->orient == 'E')
-    {
-        maze->left_cell[0] = maze->curr_cell[0];
-        maze->left_cell[1] = maze->curr_cell[1] + 1;
-
-        maze->right_cell[0] = maze->curr_cell[0];
-        maze->right_cell[1] = maze->curr_cell[1] - 1;
-
-        maze->front_cell[0] = maze->curr_cell[0] + 1;
-        maze->front_cell[1] = maze->curr_cell[1];
-
-        maze->back_cell[0] = maze->curr_cell[0] - 1;
-        maze->back_cell[1] = maze->curr_cell[1];
-    }
-    else if (maze->orient == 'S')
-    {
-        maze->left_cell[0] = maze->curr_cell[0] + 1;
-        maze->left_cell[1] = maze->curr_cell[1];
-
-        maze->right_cell[0] = maze->curr_cell[0] - 1;
-        maze->right_cell[1] = maze->curr_cell[1];
-
-        maze->front_cell[0] = maze->curr_cell[0];
-        maze->front_cell[1] = maze->curr_cell[1] - 1;
-
-        maze->back_cell[0] = maze->curr_cell[0];
-        maze->back_cell[1] = maze->curr_cell[1] + 1;
-    }
-    else if (maze->orient == 'W')
-    {
-        maze->left_cell[0] = maze->curr_cell[0];
-        maze->left_cell[1] = maze->curr_cell[1] - 1;
-
-        maze->right_cell[0] = maze->curr_cell[0];
-        maze->right_cell[1] = maze->curr_cell[1] + 1;
-
-        maze->front_cell[0] = maze->curr_cell[0] - 1;
-        maze->front_cell[1] = maze->curr_cell[1];
-
-        maze->back_cell[0] = maze->curr_cell[0] + 1;
-        maze->back_cell[1] = maze->curr_cell[1];
-    }
-    else
-    {
-        // //log("Error updating adjacent cells!");
-    }
-}
-
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
@@ -410,7 +347,6 @@ int main(void)
 
   int a = 1;
   update_walls(&maze,&sim_maze);
-  update_adjacents(&maze,&sim_maze);
 
   while (1)
   {
