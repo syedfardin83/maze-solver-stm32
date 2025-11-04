@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<item key="replaceBarOpen" value="true"/>
+	<list key="searchhistory">
+		<item value="16"/>
+		<item value="true"/>
+		<item value="false"/>
+		<item value="dest"/>
+		<item value="API_wallRight()"/>
+		<item value="API_wallLeft()"/>
+		<item value="API_wallFront()"/>
+		<item value="turn_left(maze);"/>
+		<item value="turn_right(maze);"/>
+		<item value="move_forward(maze);"/>
+		<item value="orientation"/>
+		<item value="!"/>
+		<item value="bfs_queue"/>
+		<item value="(API_wallBack()"/>
+		<item value="(API_wallFront()"/>
+	</list>
+	<list key="replacehistory">
+		<item value="1"/>
+		<item value="0"/>
+		<item value="SIM_wall_right(sim_maze)"/>
+		<item value="SIM_wall_left(sim_maze)"/>
+		<item value="SIM_wall_front(sim_maze)"/>
+		<item value="turn_left(maze,sim_maze);"/>
+		<item value="turn_right(maze,sim_maze);"/>
+		<item value="move_forward(maze,sim_maze);"/>
+		<item value="orient"/>
+		<item value="bfs_q"/>
+		<item value="(SIM_wall_back(sim_maze)==1"/>
+		<item value="(SIM_wall_front(sim_maze)==1"/>
+		<item value="(SIM_wall_right(sim_maze)==1"/>
+		<item value="(SIM_wall_left(sim_maze)==1"/>
+		<item value="maze_y_len"/>
+	</list>
+</section>
