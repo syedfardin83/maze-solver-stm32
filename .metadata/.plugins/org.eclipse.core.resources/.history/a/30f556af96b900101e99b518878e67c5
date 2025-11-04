@@ -827,10 +827,6 @@ void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
 	    }
 }
 
-void flood_fill(struct Maze* maze, struct Maze* sim_maze){
-
-}
-
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;

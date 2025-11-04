@@ -7,7 +7,6 @@
 #define intersection_stack_max_len 50
 #define bfs_q_max_len 50
 #define path_len 10
-// destination coordinates...?
 
 
 struct Cell{
@@ -827,10 +826,6 @@ void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
 	    }
 }
 
-void flood_fill(struct Maze* maze, struct Maze* sim_maze){
-
-}
-
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
@@ -850,14 +845,31 @@ int main(void)
 
 
   struct Maze sim_maze;
-  Maze(&sim_maze,0,2);
+  Maze(&sim_maze,maze_x_len,maze_y_len);
   Maze_SIM(&sim_maze);
 
   struct Maze maze;
-  Maze(&maze,0,2);
+  Maze(&maze,maze_x_len,maze_y_len);
 
   int a = 1;
-  DFS_explore(&maze,&sim_maze);
+  update_walls(&maze,&sim_maze);
+  update_adjacents(&maze);
+
+  move_forward(&maze,&sim_maze);
+
+  update_walls(&maze,&sim_maze);
+  update_adjacents(&maze);
+
+  turn_right(&maze,&sim_maze);
+
+
+  update_walls(&maze,&sim_maze);
+  update_adjacents(&maze);
+
+  move_forward(&maze,&sim_maze);
+
+  update_walls(&maze,&sim_maze);
+  update_adjacents(&maze);
 
 
   while (1)
