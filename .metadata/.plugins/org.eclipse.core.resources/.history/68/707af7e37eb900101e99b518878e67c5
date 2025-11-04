@@ -33,7 +33,7 @@ void Cell(struct Cell* cell){
 }
 
 struct Maze{
-	struct Cell cells[maze_x_len][maze_y_len];
+	struct Cell cells[10][10];
 
 	int8_t curr_cell[2];
 	int8_t back_cell[2];
@@ -43,10 +43,10 @@ struct Maze{
 
 	char orient;
 
-	int8_t intersection_stack[intersection_stack_max_len][2];
+	int8_t intersection_stack[50][2];
 	int8_t ISLen;
 
-	uint8_t bfs_q[bfs_q_max_len][2];
+	uint8_t bfs_q[50][2];
 	int8_t q_r,q_f;
 	int8_t bfs_loc[2];
 

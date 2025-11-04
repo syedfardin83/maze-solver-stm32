@@ -2,10 +2,9 @@
 #include <stdbool.h>
 
 //	General purpose variables:
-#define maze_x_len 10
-#define maze_y_len 10
-#define intersection_stack_max_len 50
-#define bfs_q_max_len 50
+uint8_t maze_dimen[2] = {16,16};
+uint8_t intersection_stack_max_len = 100;
+uint8_t bfs_q_max_len = 100;
 
 
 struct Cell{
@@ -33,7 +32,7 @@ void Cell(struct Cell* cell){
 }
 
 struct Maze{
-	struct Cell cells[maze_x_len][maze_y_len];
+	struct Cell cells[maze_dimen[0]][maze_dimen[1]];
 
 	int8_t curr_cell[2];
 	int8_t back_cell[2];
@@ -93,8 +92,8 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
     maze->ISLen++;
 
     //cells constructor:
-    for(int i=0;i<maze_x_len;i++){
-        for(int j=0;j<maze_y_len;j++){
+    for(int i=0;i<maze_dimen[0];i++){
+        for(int j=0;j<maze_dimen[1];j++){
             Cell(&maze->cells[i][j]);
         }
     }
@@ -167,8 +166,8 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  struct Maze maze;
-  Maze(&maze,7,7);
+  struct Cell new_cell;
+  Cell(&new_cell);
 
   /* USER CODE END 2 */
 
