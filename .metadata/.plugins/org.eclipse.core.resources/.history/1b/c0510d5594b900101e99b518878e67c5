@@ -750,9 +750,6 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
     }
 }
 
-void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
-
-}
 
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
