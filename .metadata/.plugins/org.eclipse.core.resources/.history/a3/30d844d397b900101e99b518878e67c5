@@ -61,8 +61,6 @@ struct Maze{
 
 	int8_t dest[2];
 
-	int8_t path[path_len][2];
-	int8_t plen;
 
 };
 
@@ -102,8 +100,6 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
             Cell(&maze->cells[i][j]);
         }
     }
-
-    maze->plen = 0;
 };
 
 //	Simulator Functions
@@ -832,223 +828,6 @@ void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
 }
 
 void flood_fill(struct Maze* maze, struct Maze* sim_maze){
-	   // prepare BFS: clear previous bfs flags/parents and reset queue
-	    for (int8_t i = 0; i < 16; i++)
-	        for (int8_t j = 0; j < 16; j++)
-	        {
-	            maze->cells[i][j].bfs_visited = 0;
-	        }
-
-	    maze->q_f = -1;
-	    maze->q_r = -1;
-
-	    maze->bfs_loc[0] = maze->dest[0];
-	    maze->bfs_loc[1] = maze->dest[1];
-
-	    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_visited = 1;
-	    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost = 0;
-
-	    enq(maze);
-
-	    while (maze->q_r - maze->q_f + 1 > 0)
-	    {
-	        deq(maze);
-
-	        if (maze->bfs_loc[0] > 0 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallLeft==0 &&
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited==0 &&
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].visited==1)
-	        {
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited = 1;
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
-	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
-	            maze->bfs_loc[0]--;
-
-	            enq(maze);
-	            maze->bfs_loc[0]++;
-	        }
-	        if (maze->bfs_loc[1] < 15 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallFront==0 &&
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited==0 &&
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].visited==1)
-	        {
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited = 1;
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[0] = maze->bfs_loc[0];
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[1] = maze->bfs_loc[1];
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
-	            maze->bfs_loc[1]++;
-
-	            enq(maze);
-	            maze->bfs_loc[1]--;
-	        }
-	        if (maze->bfs_loc[0] < 15 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallRight==0 &&
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited==0 &&
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].visited==1)
-	        {
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited = 1;
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
-	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
-	            maze->bfs_loc[0]++;
-
-	            enq(maze);
-	            maze->bfs_loc[0]--;
-	        }
-	        if (maze->bfs_loc[1] > 0 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallBack==0 &&
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited==0 &&
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].visited==1)
-	        {
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited = 1;
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[0] = maze->bfs_loc[0];
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[1] = maze->bfs_loc[1];
-	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
-	            maze->bfs_loc[1]--;
-
-	            enq(maze);
-	            maze->bfs_loc[1]++;
-	        }
-	    }
-
-	    //  Create the shortest path
-	    // log("Starting pathfinding from " + std::to_string(curr_cell[0]) + "," + std::to_string(curr_cell[1]) + " to " + std::to_string(dest[0]) + "," + std::to_string(dest[1]));
-
-	    // Build path by following lowest cost neighbors
-
-	    // Start from current position
-	    int8_t tx = maze->curr_cell[0];
-	    int8_t ty = maze->curr_cell[1];
-
-	    // Add current cell to path
-	    maze->path[maze->plen][0] = tx;
-	    maze->path[maze->plen][1] = ty;
-	    maze->plen++;
-
-	    // Follow path of decreasing costs until we reach destination
-	    while (!(tx == maze->dest[0] && ty == maze->dest[1]))
-	    {
-	        int min_cost = 999;
-	        int8_t next_x = tx;
-	        int8_t next_y = ty;
-	        int8_t found_next = 0;
-
-	        // Check all four neighbors for the one with minimum cost
-	        // Left neighbor
-	        if (tx > 0 && maze->cells[tx][ty].wallLeft && maze->cells[tx - 1][ty].visited==0 && maze->cells[tx - 1][ty].cost < min_cost)
-	        {
-	            min_cost = maze->cells[tx - 1][ty].cost;
-	            next_x = tx - 1;
-	            next_y = ty;
-	            found_next = 1;
-	        }
-	        // Front neighbor (North)
-	        if (ty < 15 && maze->cells[tx][ty].wallFront==0 && maze->cells[tx][ty + 1].visited==1 && maze->cells[tx][ty + 1].cost < min_cost)
-	        {
-	            min_cost = maze->cells[tx][ty + 1].cost;
-	            next_x = tx;
-	            next_y = ty + 1;
-	            found_next = 1;
-	        }
-	        // Right neighbor
-	        if (tx < 15 && maze->cells[tx][ty].wallRight==0 && maze->cells[tx + 1][ty].visited==1 && maze->cells[tx + 1][ty].cost < min_cost)
-	        {
-	            min_cost = maze->cells[tx + 1][ty].cost;
-	            next_x = tx + 1;
-	            next_y = ty;
-	            found_next = 1;
-	        }
-	        // Back neighbor (South)
-	        if (ty > 0 && maze->cells[tx][ty].wallBack==0 && maze->cells[tx][ty - 1].visited==1 && maze->cells[tx][ty - 1].cost < min_cost)
-	        {
-	            min_cost = maze->cells[tx][ty - 1].cost;
-	            next_x = tx;
-	            next_y = ty - 1;
-	            found_next = 1;
-	        }
-
-	        if (found_next==0)
-	        {
-	            // log("No path found to destination!");
-	            return;
-	        }
-
-	        // Move to next cell
-	        tx = next_x;
-	        ty = next_y;
-	        maze->path[maze->plen][0] = tx;
-	        maze->path[maze->plen][1] = ty;
-	        maze->plen++;
-
-	        // Safety check
-	        if (maze->plen >= path_len)
-	        {
-	            // log("Path too long, aborting");
-	            return;
-	        }
-	    }
-
-	    // Execute the path using same logic as to_prev_intersection
-//        for (int8_t i = 1; i < plen; i++)
-//        {
-//            int8_t sx = path[i - 1][0];
-//            int8_t sy = path[i - 1][1];
-//            int8_t dx = path[i][0];
-//            int8_t dy = path[i][1];
-//
-//            // determine required absolute direction
-//            char need = 'N';
-//            if (dx == sx && dy == sy + 1)
-//                need = 'N';
-//            else if (dx == sx + 1 && dy == sy)
-//                need = 'E';
-//            else if (dx == sx && dy == sy - 1)
-//                need = 'S';
-//            else if (dx == sx - 1 && dy == sy)
-//                need = 'W';
-//
-//            // verify that planned step is not blocked by a wall in the map
-//            int8_t blocked = 0;
-//            if (need == 'N' && maze->cells[sx][sy].wallFront)
-//                blocked = 1;
-//            if (need == 'E' && maze->cells[sx][sy].wallRight)
-//                blocked = 1;
-//            if (need == 'S' && maze->cells[sx][sy].wallBack)
-//                blocked = 1;
-//            if (need == 'W' && maze->cells[sx][sy].wallLeft)
-//                blocked = 1;
-//            if (blocked==1)
-//            {
-//                // cleanup and abort
-//                for (int8_t ii = 0; ii < 16; ii++)
-//                    for (int8_t jj = 0; jj < 16; jj++)
-//                        maze->cells[ii][jj].bfs_visited = 0;
-//                maze->q_f = -1;
-//                maze->q_r = -1;
-//                return;
-//            }
-//
-//            // turn to required direction using minimal turns
-//            if (maze->orient == need)
-//            {
-//                // nothing
-//            }
-//            else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
-//                     (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
-//            {
-//                turn_left(maze,sim_maze);
-//                turn_left(maze,sim_maze);
-//            }
-//            else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
-//                     (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
-//            {
-//                turn_left(maze,sim_maze);
-//            }
-//            else
-//            {
-//                turn_right(maze,sim_maze);
-//            }
-//
-//            // move forward one step
-//            move_forward(maze,sim_maze);
-//        }
 
 }
 
@@ -1079,7 +858,6 @@ int main(void)
 
   int a = 1;
   DFS_explore(&maze,&sim_maze);
-  flood_fill(&maze,&sim_maze);
 
 
   while (1)

@@ -61,8 +61,6 @@ struct Maze{
 
 	int8_t dest[2];
 
-	int8_t path[path_len][2];
-	int8_t plen;
 
 };
 
@@ -102,8 +100,6 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
             Cell(&maze->cells[i][j]);
         }
     }
-
-    maze->plen = 0;
 };
 
 //	Simulator Functions
@@ -912,15 +908,17 @@ void flood_fill(struct Maze* maze, struct Maze* sim_maze){
 	    // log("Starting pathfinding from " + std::to_string(curr_cell[0]) + "," + std::to_string(curr_cell[1]) + " to " + std::to_string(dest[0]) + "," + std::to_string(dest[1]));
 
 	    // Build path by following lowest cost neighbors
+	    int8_t path[path_len][2];
+	    int8_t plen = 0;
 
 	    // Start from current position
 	    int8_t tx = maze->curr_cell[0];
 	    int8_t ty = maze->curr_cell[1];
 
 	    // Add current cell to path
-	    maze->path[maze->plen][0] = tx;
-	    maze->path[maze->plen][1] = ty;
-	    maze->plen++;
+	    path[plen][0] = tx;
+	    path[plen][1] = ty;
+	    plen++;
 
 	    // Follow path of decreasing costs until we reach destination
 	    while (!(tx == maze->dest[0] && ty == maze->dest[1]))
@@ -973,12 +971,12 @@ void flood_fill(struct Maze* maze, struct Maze* sim_maze){
 	        // Move to next cell
 	        tx = next_x;
 	        ty = next_y;
-	        maze->path[maze->plen][0] = tx;
-	        maze->path[maze->plen][1] = ty;
-	        maze->plen++;
+	        path[plen][0] = tx;
+	        path[plen][1] = ty;
+	        plen++;
 
 	        // Safety check
-	        if (maze->plen >= path_len)
+	        if (plen >= path_len)
 	        {
 	            // log("Path too long, aborting");
 	            return;
@@ -986,69 +984,69 @@ void flood_fill(struct Maze* maze, struct Maze* sim_maze){
 	    }
 
 	    // Execute the path using same logic as to_prev_intersection
-//        for (int8_t i = 1; i < plen; i++)
-//        {
-//            int8_t sx = path[i - 1][0];
-//            int8_t sy = path[i - 1][1];
-//            int8_t dx = path[i][0];
-//            int8_t dy = path[i][1];
-//
-//            // determine required absolute direction
-//            char need = 'N';
-//            if (dx == sx && dy == sy + 1)
-//                need = 'N';
-//            else if (dx == sx + 1 && dy == sy)
-//                need = 'E';
-//            else if (dx == sx && dy == sy - 1)
-//                need = 'S';
-//            else if (dx == sx - 1 && dy == sy)
-//                need = 'W';
-//
-//            // verify that planned step is not blocked by a wall in the map
-//            int8_t blocked = 0;
-//            if (need == 'N' && maze->cells[sx][sy].wallFront)
-//                blocked = 1;
-//            if (need == 'E' && maze->cells[sx][sy].wallRight)
-//                blocked = 1;
-//            if (need == 'S' && maze->cells[sx][sy].wallBack)
-//                blocked = 1;
-//            if (need == 'W' && maze->cells[sx][sy].wallLeft)
-//                blocked = 1;
-//            if (blocked==1)
-//            {
-//                // cleanup and abort
-//                for (int8_t ii = 0; ii < 16; ii++)
-//                    for (int8_t jj = 0; jj < 16; jj++)
-//                        maze->cells[ii][jj].bfs_visited = 0;
-//                maze->q_f = -1;
-//                maze->q_r = -1;
-//                return;
-//            }
-//
-//            // turn to required direction using minimal turns
-//            if (maze->orient == need)
-//            {
-//                // nothing
-//            }
-//            else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
-//                     (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
-//            {
-//                turn_left(maze,sim_maze);
-//                turn_left(maze,sim_maze);
-//            }
-//            else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
-//                     (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
-//            {
-//                turn_left(maze,sim_maze);
-//            }
-//            else
-//            {
-//                turn_right(maze,sim_maze);
-//            }
-//
-//            // move forward one step
-//            move_forward(maze,sim_maze);
-//        }
+        for (int8_t i = 1; i < plen; i++)
+        {
+            int8_t sx = path[i - 1][0];
+            int8_t sy = path[i - 1][1];
+            int8_t dx = path[i][0];
+            int8_t dy = path[i][1];
+
+            // determine required absolute direction
+            char need = 'N';
+            if (dx == sx && dy == sy + 1)
+                need = 'N';
+            else if (dx == sx + 1 && dy == sy)
+                need = 'E';
+            else if (dx == sx && dy == sy - 1)
+                need = 'S';
+            else if (dx == sx - 1 && dy == sy)
+                need = 'W';
+
+            // verify that planned step is not blocked by a wall in the map
+            int8_t blocked = 0;
+            if (need == 'N' && maze->cells[sx][sy].wallFront)
+                blocked = 1;
+            if (need == 'E' && maze->cells[sx][sy].wallRight)
+                blocked = 1;
+            if (need == 'S' && maze->cells[sx][sy].wallBack)
+                blocked = 1;
+            if (need == 'W' && maze->cells[sx][sy].wallLeft)
+                blocked = 1;
+            if (blocked==1)
+            {
+                // cleanup and abort
+                for (int8_t ii = 0; ii < 16; ii++)
+                    for (int8_t jj = 0; jj < 16; jj++)
+                        maze->cells[ii][jj].bfs_visited = 0;
+                maze->q_f = -1;
+                maze->q_r = -1;
+                return;
+            }
+
+            // turn to required direction using minimal turns
+            if (maze->orient == need)
+            {
+                // nothing
+            }
+            else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
+                     (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
+            {
+                turn_left(maze,sim_maze);
+                turn_left(maze,sim_maze);
+            }
+            else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
+                     (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
+            {
+                turn_left(maze,sim_maze);
+            }
+            else
+            {
+                turn_right(maze,sim_maze);
+            }
+
+            // move forward one step
+            move_forward(maze,sim_maze);
+        }
 
 }
 
@@ -1079,7 +1077,6 @@ int main(void)
 
   int a = 1;
   DFS_explore(&maze,&sim_maze);
-  flood_fill(&maze,&sim_maze);
 
 
   while (1)

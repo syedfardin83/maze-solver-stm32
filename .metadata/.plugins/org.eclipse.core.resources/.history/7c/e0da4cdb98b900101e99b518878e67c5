@@ -978,7 +978,7 @@ void flood_fill(struct Maze* maze, struct Maze* sim_maze){
 	        maze->plen++;
 
 	        // Safety check
-	        if (maze->plen >= path_len)
+	        if (maze->plen >= maze->path_len)
 	        {
 	            // log("Path too long, aborting");
 	            return;
