@@ -1,27 +1,55 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2025 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdbool.h>
 
-//	General purpose variables:
-uint8_t maze_dimen[2] = {16,16};
-uint8_t intersection_stack_max_len = 100;
-uint8_t bfs_q_max_len = 12;
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+bool my_bool = false;
 
 struct Cell{
-	uint8_t wallLeft;
+	bool wallLeft;
 	uint8_t wallRight;
 	uint8_t wallFront;
 	uint8_t wallBack;
 	uint8_t visited;
 
 	uint8_t bfs_visited;
-	uint8_t bfs_parent[2];
+	int bfs_parent[2];
 
-	uint8_t cost;
+	int cost;
 
 };
 
 void Cell(struct Cell* cell){
-	cell->wallLeft = 0;
+	cell->wallLeft = false;
 	cell->wallRight = 0;
 	cell->wallFront = 0;
 	cell->wallBack = 0;
@@ -30,24 +58,6 @@ void Cell(struct Cell* cell){
 	cell->cost = 0;
 }
 
-struct Maze{
-	struct Cell cells[maze_dimen[0]][maze_dimen[1]];
-
-	uint8_t curr_cell[2];
-	uint8_t back_cell[2];
-	uint8_t front_cell[2];
-	uint8_t left_cell[2];
-	uint8_t right_cell[2];
-
-	char orient;
-
-	uint8_t intersection_stack[intersection_stack_max_len][2];
-	uint8_t ISLen;
-
-
-
-
-};
 
 /* USER CODE END PD */
 
