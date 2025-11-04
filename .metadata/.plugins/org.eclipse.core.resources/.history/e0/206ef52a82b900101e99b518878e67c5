@@ -2,8 +2,8 @@
 #include <stdbool.h>
 
 //	General purpose variables:
-#define maze_x_len 3
-#define maze_y_len 3
+#define maze_x_len 10
+#define maze_y_len 10
 #define intersection_stack_max_len 50
 #define bfs_q_max_len 50
 
@@ -100,54 +100,6 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
     }
 };
 
-void Maze_SIM(struct Maze* maze){
-	maze->cells[0][0].wallLeft = 1;
-	maze->cells[0][0].wallFront = 0;
-	maze->cells[0][0].wallRight = 1;
-	maze->cells[0][0].wallBack = 1;
-
-	maze->cells[0][1].wallLeft = 1;
-	maze->cells[0][1].wallFront = 1;
-	maze->cells[0][1].wallRight = 0;
-	maze->cells[0][1].wallBack = 0;
-
-	maze->cells[0][2].wallLeft = 1;
-	maze->cells[0][2].wallFront = 1;
-	maze->cells[0][2].wallRight = 0;
-	maze->cells[0][2].wallBack = 1;
-
-	maze->cells[1][0].wallLeft = 1;
-	maze->cells[1][0].wallFront = 1;
-	maze->cells[1][0].wallRight = 1;
-	maze->cells[1][0].wallBack = 1;
-
-	maze->cells[1][1].wallLeft = 0;
-	maze->cells[1][1].wallFront = 1;
-	maze->cells[1][1].wallRight = 0;
-	maze->cells[1][1].wallBack = 1;
-
-	maze->cells[1][2].wallLeft = 0;
-	maze->cells[1][2].wallFront = 1;
-	maze->cells[1][2].wallRight = 0;
-	maze->cells[1][2].wallBack = 1;
-
-	maze->cells[2][0].wallLeft = 1;
-	maze->cells[2][0].wallFront = 0;
-	maze->cells[2][0].wallRight = 1;
-	maze->cells[2][0].wallBack = 1;
-
-	maze->cells[2][1].wallLeft = 0;
-	maze->cells[2][1].wallFront = 0;
-	maze->cells[2][1].wallRight = 1;
-	maze->cells[2][1].wallBack = 0;
-
-	maze->cells[2][2].wallLeft = 0;
-	maze->cells[2][2].wallFront = 1;
-	maze->cells[2][2].wallRight = 1;
-	maze->cells[2][2].wallBack = 0;
-
-}
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -215,8 +167,8 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  struct Maze sim_maze;
-  Maze(&sim_maze,maze_x_len,maze_y_len);
+  struct Maze maze;
+  Maze(&maze,7,7);
 
   /* USER CODE END 2 */
 
