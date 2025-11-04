@@ -305,3 +305,101 @@ Finished building: default.size.stdout
  
 Finished building: algo_test_1.list
  
+19:21:06 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'SIM_wall_left':
+../Core/Src/main.c:174:12: error: 'orient' undeclared (first use in this function)
+  174 |         if(orient=='N' && maze->wallLeft==1) return 1;
+      |            ^~~~~~
+../Core/Src/main.c:174:12: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:174:31: error: 'struct Maze' has no member named 'wallLeft'
+  174 |         if(orient=='N' && maze->wallLeft==1) return 1;
+      |                               ^~
+../Core/Src/main.c:175:36: error: 'struct Maze' has no member named 'wallFront'
+  175 |         else if(orient=='E' && maze->wallFront==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:176:36: error: 'struct Maze' has no member named 'wallRight'
+  176 |         else if(orient=='S' && maze->wallRight==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:177:36: error: 'struct Maze' has no member named 'wallBack'
+  177 |         else if(orient=='W' && maze->wallBack==1) return 1;
+      |                                    ^~
+../Core/Src/main.c: In function 'SIM_wall_right':
+../Core/Src/main.c:181:12: error: 'orient' undeclared (first use in this function)
+  181 |         if(orient=='N' && maze->wallRight==1) return 1;
+      |            ^~~~~~
+../Core/Src/main.c:181:31: error: 'struct Maze' has no member named 'wallRight'
+  181 |         if(orient=='N' && maze->wallRight==1) return 1;
+      |                               ^~
+../Core/Src/main.c:182:36: error: 'struct Maze' has no member named 'wallBack'
+  182 |         else if(orient=='E' && maze->wallBack==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:183:36: error: 'struct Maze' has no member named 'wallLeft'
+  183 |         else if(orient=='S' && maze->wallLeft==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:184:36: error: 'struct Maze' has no member named 'wallFront'
+  184 |         else if(orient=='W' && maze->wallFront==1) return 1;
+      |                                    ^~
+../Core/Src/main.c: In function 'SIM_wall_front':
+../Core/Src/main.c:188:12: error: 'orient' undeclared (first use in this function)
+  188 |         if(orient=='N' && maze->wallFront==1) return 1;
+      |            ^~~~~~
+../Core/Src/main.c:188:31: error: 'struct Maze' has no member named 'wallFront'
+  188 |         if(orient=='N' && maze->wallFront==1) return 1;
+      |                               ^~
+../Core/Src/main.c:189:36: error: 'struct Maze' has no member named 'wallRight'
+  189 |         else if(orient=='E' && maze->wallRight==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:190:36: error: 'struct Maze' has no member named 'wallBack'
+  190 |         else if(orient=='S' && maze->wallBack==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:191:36: error: 'struct Maze' has no member named 'wallLeft'
+  191 |         else if(orient=='W' && maze->wallLeft==1) return 1;
+      |                                    ^~
+../Core/Src/main.c: In function 'SIM_wall_back':
+../Core/Src/main.c:195:12: error: 'orient' undeclared (first use in this function)
+  195 |         if(orient=='N' && maze->wallBack==1) return 1;
+      |            ^~~~~~
+../Core/Src/main.c:195:31: error: 'struct Maze' has no member named 'wallBack'
+  195 |         if(orient=='N' && maze->wallBack==1) return 1;
+      |                               ^~
+../Core/Src/main.c:196:36: error: 'struct Maze' has no member named 'wallLeft'
+  196 |         else if(orient=='E' && maze->wallLeft==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:197:36: error: 'struct Maze' has no member named 'wallFront'
+  197 |         else if(orient=='S' && maze->wallFront==1) return 1;
+      |                                    ^~
+../Core/Src/main.c:198:36: error: 'struct Maze' has no member named 'wallRight'
+  198 |         else if(orient=='W' && maze->wallRight==1) return 1;
+      |                                    ^~
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j18 all" terminated with exit code 2. Build might be incomplete.
+19:25:33 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "algo_test_1.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Syed Fardin\Desktop\Coding\maze-solver-stm32\algo_test_1\STM32L072CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="algo_test_1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: algo_test_1.elf
+ 
+arm-none-eabi-size  algo_test_1.elf 
+arm-none-eabi-objdump -h -S algo_test_1.elf  > "algo_test_1.list"
+   text	   data	    bss	    dec	    hex	filename
+  16448	     12	   1828	  18288	   4770	algo_test_1.elf
+Finished building: default.size.stdout
+ 
+Finished building: algo_test_1.list
+ 
+19:28:35 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "algo_test_1.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Syed Fardin\Desktop\Coding\maze-solver-stm32\algo_test_1\STM32L072CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="algo_test_1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: algo_test_1.elf
+ 
+arm-none-eabi-size  algo_test_1.elf 
+arm-none-eabi-objdump -h -S algo_test_1.elf  > "algo_test_1.list"
+   text	   data	    bss	    dec	    hex	filename
+  16568	     12	   1828	  18408	   47e8	algo_test_1.elf
+Finished building: default.size.stdout
+ 
+Finished building: algo_test_1.list
+ 
