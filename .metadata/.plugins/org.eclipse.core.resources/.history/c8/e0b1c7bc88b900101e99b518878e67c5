@@ -201,7 +201,7 @@ uint8_t SIM_wall_back(struct Maze* maze){
 
 //	Algorithm functions:
 void update_walls(struct Maze* maze,struct Maze* sim_maze){
-    if (maze->orient == 'N')
+    if (maze->orientation == 'N')
     {
         // multiple sensors can report walls; check each independently
         if (SIM_wall_left(sim_maze)==1)
@@ -233,7 +233,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
         }
     }
-    else if (maze->orient == 'E')
+    else if (maze->orientation == 'E')
     {
         if (SIM_wall_left(sim_maze)==1)
         {
@@ -260,7 +260,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
         }
     }
-    else if (maze->orient == 'S')
+    else if (maze->orientation == 'S')
     {
         if (SIM_wall_left(sim_maze)==1)
         {
@@ -287,7 +287,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
         }
     }
-    else if (maze->orient == 'W')
+    else if (maze->orientation == 'W')
     {
         if (SIM_wall_left(sim_maze)==1)
         {

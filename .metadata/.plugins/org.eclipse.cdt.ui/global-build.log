@@ -403,3 +403,103 @@ Finished building: default.size.stdout
  
 Finished building: algo_test_1.list
  
+19:33:44 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:271:11: warning: variable 'wall_Front' set but not used [-Wunused-but-set-variable]
+  271 |   uint8_t wall_Front = 3;
+      |           ^~~~~~~~~~
+arm-none-eabi-gcc -o "algo_test_1.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Syed Fardin\Desktop\Coding\maze-solver-stm32\algo_test_1\STM32L072CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="algo_test_1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: algo_test_1.elf
+ 
+arm-none-eabi-size  algo_test_1.elf 
+arm-none-eabi-objdump -h -S algo_test_1.elf  > "algo_test_1.list"
+   text	   data	    bss	    dec	    hex	filename
+  16892	     12	   1828	  18732	   492c	algo_test_1.elf
+Finished building: default.size.stdout
+ 
+Finished building: algo_test_1.list
+ 
+19:43:33 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'update_walls':
+../Core/Src/main.c:204:13: error: 'struct Maze' has no member named 'orientation'
+  204 |     if (maze->orientation == 'N')
+      |             ^~
+../Core/Src/main.c:236:18: error: 'struct Maze' has no member named 'orientation'
+  236 |     else if (maze->orientation == 'E')
+      |                  ^~
+../Core/Src/main.c:263:18: error: 'struct Maze' has no member named 'orientation'
+  263 |     else if (maze->orientation == 'S')
+      |                  ^~
+../Core/Src/main.c:290:18: error: 'struct Maze' has no member named 'orientation'
+  290 |     else if (maze->orientation == 'W')
+      |                  ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:346:25: error: 'maze_y' undeclared (first use in this function); did you mean 'maze'?
+  346 |   Maze(&maze,maze_x_len,maze_y,len);
+      |                         ^~~~~~
+      |                         maze
+../Core/Src/main.c:346:25: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:346:32: error: 'len' undeclared (first use in this function)
+  346 |   Maze(&maze,maze_x_len,maze_y,len);
+      |                                ^~~
+../Core/Src/main.c:346:3: error: too many arguments to function 'Maze'
+  346 |   Maze(&maze,maze_x_len,maze_y,len);
+      |   ^~~~
+../Core/Src/main.c:65:6: note: declared here
+   65 | void Maze(struct Maze* maze,int8_t destx,int8_t desty){
+      |      ^~~~
+../Core/Src/main.c:349:3: error: too few arguments to function 'update_walls'
+  349 |   update_walls(&maze);
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:203:6: note: declared here
+  203 | void update_walls(struct Maze* maze,struct Maze* sim_maze){
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:348:7: warning: unused variable 'a' [-Wunused-variable]
+  348 |   int a = 1;
+      |       ^
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j18 all" terminated with exit code 2. Build might be incomplete.
+19:44:59 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'update_walls':
+../Core/Src/main.c:204:13: error: 'struct Maze' has no member named 'orientation'
+  204 |     if (maze->orientation == 'N')
+      |             ^~
+../Core/Src/main.c:236:18: error: 'struct Maze' has no member named 'orientation'
+  236 |     else if (maze->orientation == 'E')
+      |                  ^~
+../Core/Src/main.c:263:18: error: 'struct Maze' has no member named 'orientation'
+  263 |     else if (maze->orientation == 'S')
+      |                  ^~
+../Core/Src/main.c:290:18: error: 'struct Maze' has no member named 'orientation'
+  290 |     else if (maze->orientation == 'W')
+      |                  ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:348:7: warning: unused variable 'a' [-Wunused-variable]
+  348 |   int a = 1;
+      |       ^
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j18 all" terminated with exit code 2. Build might be incomplete.
+19:45:40 **** Incremental Build of configuration Debug for project algo_test_1 ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:348:7: warning: unused variable 'a' [-Wunused-variable]
+  348 |   int a = 1;
+      |       ^
+arm-none-eabi-gcc -o "algo_test_1.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Syed Fardin\Desktop\Coding\maze-solver-stm32\algo_test_1\STM32L072CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="algo_test_1.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: algo_test_1.elf
+ 
+arm-none-eabi-size  algo_test_1.elf 
+arm-none-eabi-objdump -h -S algo_test_1.elf  > "algo_test_1.list"
+   text	   data	    bss	    dec	    hex	filename
+  19124	     12	   1828	  20964	   51e4	algo_test_1.elf
+Finished building: default.size.stdout
+ 
+Finished building: algo_test_1.list
+ 

@@ -198,159 +198,100 @@ uint8_t SIM_wall_back(struct Maze* maze){
 	else if(maze->orient=='W' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight==1) return 1;
 	return 0;
 }
+/* USER CODE END PD */
 
-//	Algorithm functions:
-void update_walls(struct Maze* maze,struct Maze* sim_maze){
-    if (maze->orient == 'N')
-    {
-        // multiple sensors can report walls; check each independently
-        if (SIM_wall_left(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
-            // symmetric update: neighbor to the west has right wall
-            if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
-        }
-        if (SIM_wall_right(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
-            // symmetric update: neighbor to the east has left wall
-            if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
-        }
-        if (SIM_wall_front(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
-            // symmetric update: neighbor to the north has back wall
-            if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
-        }
-        if (SIM_wall_back(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
-            // symmetric update: neighbor to the south has front wall
-            if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
-        }
-    }
-    else if (maze->orient == 'E')
-    {
-        if (SIM_wall_left(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
-            if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
-        }
-        if (SIM_wall_right(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
-            if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
-        }
-        if (SIM_wall_front(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
-            if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
-        }
-        if (SIM_wall_back(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
-            if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
-        }
-    }
-    else if (maze->orient == 'S')
-    {
-        if (SIM_wall_left(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
-            if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
-        }
-        if (SIM_wall_right(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
-            if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
-        }
-        if (SIM_wall_front(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
-            if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
-        }
-        if (SIM_wall_back(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
-            if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
-        }
-    }
-    else if (maze->orient == 'W')
-    {
-        if (SIM_wall_left(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
-            if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
-        }
-        if (SIM_wall_right(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
-            if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
-        }
-        if (SIM_wall_front(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
-            if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
-        }
-        if (SIM_wall_back(sim_maze)==1)
-        {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
-            if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
-        }
-    }
-    else
-    {
-        // //log("Error updating walls!");
-    }
-}
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
 RTC_HandleTypeDef hrtc;
+
 SPI_HandleTypeDef hspi1;
+
 UART_HandleTypeDef huart2;
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_RTC_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
-
+  /* USER CODE BEGIN 2 */
 
   struct Maze sim_maze;
   Maze(&sim_maze,maze_x_len,maze_y_len);
   Maze_SIM(&sim_maze);
+  uint8_t wall_Front = 3;
 
-  struct Maze maze;
-  Maze(&maze,maze_x_len,maze_y_len);
+  wall_Front = SIM_wall_front(&sim_maze);
+  SIM_move_forward(&sim_maze);
+  wall_Front = SIM_wall_front(&sim_maze);
+  SIM_turn_right(&sim_maze);
+  wall_Front = SIM_wall_front(&sim_maze);
+  SIM_move_forward(&sim_maze);
+  wall_Front = SIM_wall_front(&sim_maze);
+  SIM_move_forward(&sim_maze);
+  wall_Front = SIM_wall_front(&sim_maze);
 
-  int a = 1;
-  update_walls(&maze,&sim_maze);
 
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+    /* USER CODE BEGIN 3 */
+
   }
+  /* USER CODE END 3 */
 }
 
 /**
