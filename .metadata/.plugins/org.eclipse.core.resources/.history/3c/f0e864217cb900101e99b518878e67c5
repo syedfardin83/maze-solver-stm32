@@ -4,8 +4,7 @@
 //	General purpose variables:
 uint8_t maze_dimen[2] = {16,16};
 uint8_t intersection_stack_max_len = 100;
-uint8_t bfs_q_max_len = 100;
-
+uint8_t bfs_q_max_len = 12;
 
 struct Cell{
 	uint8_t wallLeft;
@@ -15,9 +14,9 @@ struct Cell{
 	uint8_t visited;
 
 	uint8_t bfs_visited;
-	int8_t bfs_parent[2];
+	uint8_t bfs_parent[2];
 
-	int8_t cost;
+	uint8_t cost;
 
 };
 
@@ -34,34 +33,19 @@ void Cell(struct Cell* cell){
 struct Maze{
 	struct Cell cells[maze_dimen[0]][maze_dimen[1]];
 
-	int8_t curr_cell[2];
-	int8_t back_cell[2];
-	int8_t front_cell[2];
-	int8_t left_cell[2];
-	int8_t right_cell[2];
+	uint8_t curr_cell[2];
+	uint8_t back_cell[2];
+	uint8_t front_cell[2];
+	uint8_t left_cell[2];
+	uint8_t right_cell[2];
 
 	char orient;
 
-	int8_t intersection_stack[intersection_stack_max_len][2];
-	int8_t ISLen;
-
-	uint8_t bfs_q[bfs_q_max_len][2];
-	int8_t q_r,q_f;
-	int8_t bfs_loc[2];
-
-	int8_t n_ways;
-	int8_t n_visited;
-
-	int8_t prev_removed[2];
-
-	int8_t exploration_done;
-
-	int8_t dest[2];
+	uint8_t intersection_stack[intersection_stack_max_len][2];
+	uint8_t ISLen;
 
 
-};
 
-void Maze(struct Maze* maze){
 
 };
 
