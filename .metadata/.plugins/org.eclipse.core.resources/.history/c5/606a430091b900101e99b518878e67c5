@@ -199,8 +199,6 @@ uint8_t SIM_wall_back(struct Maze* maze){
 	return 0;
 }
 
-
-
 //	Algorithm functions:
 void update_walls(struct Maze* maze,struct Maze* sim_maze){
     if (maze->orient == 'N')
@@ -412,61 +410,6 @@ void move_forward(struct Maze* maze,struct Maze* sim_maze){
     update_adjacents(maze);
 }
 
-void turn_left(struct Maze* maze, struct Maze* sim_maze){
-	SIM_turn_left(sim_maze);
-	    // Change orient first, then update adjacent cells
-	    if (maze->orient == 'N')
-	    {
-	        maze->orient = 'W';
-	    }
-	    else if (maze->orient == 'E')
-	    {
-	        maze->orient = 'N';
-	    }
-	    else if (maze->orient == 'S')
-	    {
-	        maze->orient = 'E';
-	    }
-	    else if (maze->orient == 'W')
-	    {
-	        maze->orient = 'S';
-	    }
-	    else
-	    {
-	        // //log("Error turning left!");
-	    }
-
-	    update_adjacents(maze);
-}
-
-void turn_right(struct Maze *maze,struct Maze* sim_maze)
-{
-    SIM_turn_right(sim_maze);
-    // Change orient first, then update adjacent cells
-    if (maze->orient == 'N')
-    {
-        maze->orient = 'E';
-    }
-    else if (maze->orient == 'E')
-    {
-        maze->orient = 'S';
-    }
-    else if (maze->orient == 'S')
-    {
-        maze->orient = 'W';
-    }
-    else if (maze->orient == 'W')
-    {
-        maze->orient = 'N';
-    }
-    else
-    {
-        // //log("Error turning right!");
-    }
-
-    update_adjacents(maze);
-}
-
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
@@ -495,23 +438,9 @@ int main(void)
   int a = 1;
   update_walls(&maze,&sim_maze);
   update_adjacents(&maze);
-
   move_forward(&maze,&sim_maze);
-
   update_walls(&maze,&sim_maze);
   update_adjacents(&maze);
-
-  turn_right(&maze,&sim_maze);
-
-
-  update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
-
-  move_forward(&maze,&sim_maze);
-
-  update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
-
 
   while (1)
   {

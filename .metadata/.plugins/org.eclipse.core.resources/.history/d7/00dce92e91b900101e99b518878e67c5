@@ -495,23 +495,9 @@ int main(void)
   int a = 1;
   update_walls(&maze,&sim_maze);
   update_adjacents(&maze);
-
   move_forward(&maze,&sim_maze);
-
   update_walls(&maze,&sim_maze);
   update_adjacents(&maze);
-
-  turn_right(&maze,&sim_maze);
-
-
-  update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
-
-  move_forward(&maze,&sim_maze);
-
-  update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
-
 
   while (1)
   {

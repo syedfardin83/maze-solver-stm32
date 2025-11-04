@@ -493,6 +493,7 @@ int main(void)
   Maze(&maze,maze_x_len,maze_y_len);
 
   int a = 1;
+  a++;
   update_walls(&maze,&sim_maze);
   update_adjacents(&maze);
 
