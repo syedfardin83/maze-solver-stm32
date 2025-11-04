@@ -384,7 +384,7 @@ void update_adjacents(struct Maze* maze){
 }
 
 void move_forward(struct Maze* maze,struct Maze* sim_maze){
-    SIM_move_forward(sim_maze);
+    SIM_move_forward();
     // Change virtual position first, then update adjacent cells
     if (maze->orient == 'N')
     {

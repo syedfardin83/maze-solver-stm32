@@ -320,7 +320,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
     }
 }
 
-void update_adjacents(struct Maze* maze){
+void update_adjacents(struct Maze* maze,struct Maze* sim_maze){
     if (maze->orient == 'N')
     {
         maze->left_cell[0] = maze->curr_cell[0] - 1;
@@ -383,33 +383,6 @@ void update_adjacents(struct Maze* maze){
     }
 }
 
-void move_forward(struct Maze* maze,struct Maze* sim_maze){
-    SIM_move_forward(sim_maze);
-    // Change virtual position first, then update adjacent cells
-    if (maze->orient == 'N')
-    {
-        maze->curr_cell[1] = maze->curr_cell[1] + 1;
-    }
-    else if (maze->orient == 'E')
-    {
-        maze->curr_cell[0] = maze->curr_cell[0] + 1;
-    }
-    else if (maze->orient == 'S')
-    {
-        maze->curr_cell[1] = maze->curr_cell[1] - 1;
-    }
-    else if (maze->orient == 'W')
-    {
-        maze->curr_cell[0] = maze->curr_cell[0] - 1;
-    }
-    else
-    {
-        //log("Error changing position");
-    }
-
-    update_adjacents(maze);
-}
-
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
@@ -437,10 +410,7 @@ int main(void)
 
   int a = 1;
   update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
-  move_forward(&maze,&sim_maze);
-  update_walls(&maze,&sim_maze);
-  update_adjacents(&maze);
+  update_adjacents(&maze,&sim_maze);
 
   while (1)
   {
