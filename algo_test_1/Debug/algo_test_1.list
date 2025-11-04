@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  0000600c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000ddfe  00000000  00000000  00006034  2**0
+ 12 .debug_info   0000e08d  00000000  00000000  00006034  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00002168  00000000  00000000  00013e32  2**0
+ 13 .debug_abbrev 0000218d  00000000  00000000  000140c1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000c58  00000000  00000000  00015fa0  2**3
+ 14 .debug_aranges 00000c70  00000000  00000000  00016250  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 0000099a  00000000  00000000  00016bf8  2**0
+ 15 .debug_rnglists 000009bc  00000000  00000000  00016ec0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001462c  00000000  00000000  00017592  2**0
+ 16 .debug_macro  00014632  00000000  00000000  0001787c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000f699  00000000  00000000  0002bbbe  2**0
+ 17 .debug_line   0000fdeb  00000000  00000000  0002beae  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007fb13  00000000  00000000  0003b257  2**0
+ 18 .debug_str    0007fb53  00000000  00000000  0003bc99  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000bad6a  2**0
+ 19 .comment      00000043  00000000  00000000  000bb7ec  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00002bf8  00000000  00000000  000badb0  2**2
+ 20 .debug_frame  00002c5c  00000000  00000000  000bb830  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000070  00000000  00000000  000bd9a8  2**0
+ 21 .debug_line_str 00000070  00000000  00000000  000be48c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1636,7 +1636,6 @@ uint8_t SIM_wall_back(struct Maze* maze){
 08000bb0 <update_walls>:
 
 
-
 //	Algorithm functions:
 void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000bb0:	b580      	push	{r7, lr}
@@ -1661,7 +1660,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000bd0:	2b01      	cmp	r3, #1
  8000bd2:	d12c      	bne.n	8000c2e <update_walls+0x7e>
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
  8000bd4:	687b      	ldr	r3, [r7, #4]
  8000bd6:	2251      	movs	r2, #81	@ 0x51
  8000bd8:	569b      	ldrsb	r3, [r3, r2]
@@ -1688,7 +1687,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000bfe:	569b      	ldrsb	r3, [r3, r2]
  8000c00:	2b00      	cmp	r3, #0
  8000c02:	dd14      	ble.n	8000c2e <update_walls+0x7e>
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
  8000c04:	687b      	ldr	r3, [r7, #4]
  8000c06:	2251      	movs	r2, #81	@ 0x51
  8000c08:	569b      	ldrsb	r3, [r3, r2]
@@ -1719,7 +1718,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000c38:	2b01      	cmp	r3, #1
  8000c3a:	d12c      	bne.n	8000c96 <update_walls+0xe6>
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
  8000c3c:	687b      	ldr	r3, [r7, #4]
  8000c3e:	2251      	movs	r2, #81	@ 0x51
  8000c40:	569b      	ldrsb	r3, [r3, r2]
@@ -1748,7 +1747,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000c6a:	569b      	ldrsb	r3, [r3, r2]
  8000c6c:	2b0e      	cmp	r3, #14
  8000c6e:	dc12      	bgt.n	8000c96 <update_walls+0xe6>
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
  8000c70:	687b      	ldr	r3, [r7, #4]
  8000c72:	2251      	movs	r2, #81	@ 0x51
  8000c74:	569b      	ldrsb	r3, [r3, r2]
@@ -1777,7 +1776,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000ca0:	2b01      	cmp	r3, #1
  8000ca2:	d12f      	bne.n	8000d04 <update_walls+0x154>
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
  8000ca4:	687b      	ldr	r3, [r7, #4]
  8000ca6:	2251      	movs	r2, #81	@ 0x51
  8000ca8:	569b      	ldrsb	r3, [r3, r2]
@@ -1806,7 +1805,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000cd2:	569b      	ldrsb	r3, [r3, r2]
  8000cd4:	2b0e      	cmp	r3, #14
  8000cd6:	dc15      	bgt.n	8000d04 <update_walls+0x154>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
  8000cd8:	687b      	ldr	r3, [r7, #4]
  8000cda:	2251      	movs	r2, #81	@ 0x51
  8000cdc:	569b      	ldrsb	r3, [r3, r2]
@@ -1839,7 +1838,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000d10:	d000      	beq.n	8000d14 <update_walls+0x164>
  8000d12:	e2cb      	b.n	80012ac <update_walls+0x6fc>
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
  8000d14:	687b      	ldr	r3, [r7, #4]
  8000d16:	2251      	movs	r2, #81	@ 0x51
  8000d18:	569b      	ldrsb	r3, [r3, r2]
@@ -1869,7 +1868,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000d44:	2b00      	cmp	r3, #0
  8000d46:	dc00      	bgt.n	8000d4a <update_walls+0x19a>
  8000d48:	e2b0      	b.n	80012ac <update_walls+0x6fc>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
  8000d4a:	687b      	ldr	r3, [r7, #4]
  8000d4c:	2251      	movs	r2, #81	@ 0x51
  8000d4e:	569b      	ldrsb	r3, [r3, r2]
@@ -1913,7 +1912,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000d8c:	0003      	movs	r3, r0
  8000d8e:	2b01      	cmp	r3, #1
  8000d90:	d12f      	bne.n	8000df2 <update_walls+0x242>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
  8000d92:	687b      	ldr	r3, [r7, #4]
  8000d94:	2251      	movs	r2, #81	@ 0x51
  8000d96:	569b      	ldrsb	r3, [r3, r2]
@@ -1941,7 +1940,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000dc0:	569b      	ldrsb	r3, [r3, r2]
  8000dc2:	2b0e      	cmp	r3, #14
  8000dc4:	dc15      	bgt.n	8000df2 <update_walls+0x242>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
  8000dc6:	687b      	ldr	r3, [r7, #4]
  8000dc8:	2251      	movs	r2, #81	@ 0x51
  8000dca:	569b      	ldrsb	r3, [r3, r2]
@@ -1971,7 +1970,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000dfa:	0003      	movs	r3, r0
  8000dfc:	2b01      	cmp	r3, #1
  8000dfe:	d12f      	bne.n	8000e60 <update_walls+0x2b0>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
  8000e00:	687b      	ldr	r3, [r7, #4]
  8000e02:	2251      	movs	r2, #81	@ 0x51
  8000e04:	569b      	ldrsb	r3, [r3, r2]
@@ -1999,7 +1998,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000e2e:	569b      	ldrsb	r3, [r3, r2]
  8000e30:	2b00      	cmp	r3, #0
  8000e32:	dd15      	ble.n	8000e60 <update_walls+0x2b0>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
  8000e34:	687b      	ldr	r3, [r7, #4]
  8000e36:	2251      	movs	r2, #81	@ 0x51
  8000e38:	569b      	ldrsb	r3, [r3, r2]
@@ -2029,7 +2028,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000e68:	0003      	movs	r3, r0
  8000e6a:	2b01      	cmp	r3, #1
  8000e6c:	d12c      	bne.n	8000ec8 <update_walls+0x318>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
  8000e6e:	687b      	ldr	r3, [r7, #4]
  8000e70:	2251      	movs	r2, #81	@ 0x51
  8000e72:	569b      	ldrsb	r3, [r3, r2]
@@ -2057,7 +2056,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000e9c:	569b      	ldrsb	r3, [r3, r2]
  8000e9e:	2b0e      	cmp	r3, #14
  8000ea0:	dc12      	bgt.n	8000ec8 <update_walls+0x318>
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
  8000ea2:	687b      	ldr	r3, [r7, #4]
  8000ea4:	2251      	movs	r2, #81	@ 0x51
  8000ea6:	569b      	ldrsb	r3, [r3, r2]
@@ -2085,7 +2084,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000ed2:	2b01      	cmp	r3, #1
  8000ed4:	d000      	beq.n	8000ed8 <update_walls+0x328>
  8000ed6:	e1e9      	b.n	80012ac <update_walls+0x6fc>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
  8000ed8:	687b      	ldr	r3, [r7, #4]
  8000eda:	2251      	movs	r2, #81	@ 0x51
  8000edc:	569b      	ldrsb	r3, [r3, r2]
@@ -2112,7 +2111,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000f04:	2b00      	cmp	r3, #0
  8000f06:	dc00      	bgt.n	8000f0a <update_walls+0x35a>
  8000f08:	e1d0      	b.n	80012ac <update_walls+0x6fc>
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
  8000f0a:	687b      	ldr	r3, [r7, #4]
  8000f0c:	2251      	movs	r2, #81	@ 0x51
  8000f0e:	569b      	ldrsb	r3, [r3, r2]
@@ -2150,7 +2149,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000f4a:	0003      	movs	r3, r0
  8000f4c:	2b01      	cmp	r3, #1
  8000f4e:	d12c      	bne.n	8000faa <update_walls+0x3fa>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
  8000f50:	687b      	ldr	r3, [r7, #4]
  8000f52:	2251      	movs	r2, #81	@ 0x51
  8000f54:	569b      	ldrsb	r3, [r3, r2]
@@ -2178,7 +2177,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000f7e:	569b      	ldrsb	r3, [r3, r2]
  8000f80:	2b0e      	cmp	r3, #14
  8000f82:	dc12      	bgt.n	8000faa <update_walls+0x3fa>
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
  8000f84:	687b      	ldr	r3, [r7, #4]
  8000f86:	2251      	movs	r2, #81	@ 0x51
  8000f88:	569b      	ldrsb	r3, [r3, r2]
@@ -2205,7 +2204,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000fb2:	0003      	movs	r3, r0
  8000fb4:	2b01      	cmp	r3, #1
  8000fb6:	d12c      	bne.n	8001012 <update_walls+0x462>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
  8000fb8:	687b      	ldr	r3, [r7, #4]
  8000fba:	2251      	movs	r2, #81	@ 0x51
  8000fbc:	569b      	ldrsb	r3, [r3, r2]
@@ -2231,7 +2230,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8000fe2:	569b      	ldrsb	r3, [r3, r2]
  8000fe4:	2b00      	cmp	r3, #0
  8000fe6:	dd14      	ble.n	8001012 <update_walls+0x462>
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
  8000fe8:	687b      	ldr	r3, [r7, #4]
  8000fea:	2251      	movs	r2, #81	@ 0x51
  8000fec:	569b      	ldrsb	r3, [r3, r2]
@@ -2260,7 +2259,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  800101a:	0003      	movs	r3, r0
  800101c:	2b01      	cmp	r3, #1
  800101e:	d12f      	bne.n	8001080 <update_walls+0x4d0>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
  8001020:	687b      	ldr	r3, [r7, #4]
  8001022:	2251      	movs	r2, #81	@ 0x51
  8001024:	569b      	ldrsb	r3, [r3, r2]
@@ -2288,7 +2287,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  800104e:	569b      	ldrsb	r3, [r3, r2]
  8001050:	2b00      	cmp	r3, #0
  8001052:	dd15      	ble.n	8001080 <update_walls+0x4d0>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
  8001054:	687b      	ldr	r3, [r7, #4]
  8001056:	2251      	movs	r2, #81	@ 0x51
  8001058:	569b      	ldrsb	r3, [r3, r2]
@@ -2319,7 +2318,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  800108a:	2b01      	cmp	r3, #1
  800108c:	d000      	beq.n	8001090 <update_walls+0x4e0>
  800108e:	e10d      	b.n	80012ac <update_walls+0x6fc>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
  8001090:	687b      	ldr	r3, [r7, #4]
  8001092:	2251      	movs	r2, #81	@ 0x51
  8001094:	569b      	ldrsb	r3, [r3, r2]
@@ -2348,7 +2347,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  80010c0:	2b0e      	cmp	r3, #14
  80010c2:	dd00      	ble.n	80010c6 <update_walls+0x516>
  80010c4:	e0f2      	b.n	80012ac <update_walls+0x6fc>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
  80010c6:	687b      	ldr	r3, [r7, #4]
  80010c8:	2251      	movs	r2, #81	@ 0x51
  80010ca:	569b      	ldrsb	r3, [r3, r2]
@@ -2387,7 +2386,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8001108:	0003      	movs	r3, r0
  800110a:	2b01      	cmp	r3, #1
  800110c:	d12f      	bne.n	800116e <update_walls+0x5be>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
  800110e:	687b      	ldr	r3, [r7, #4]
  8001110:	2251      	movs	r2, #81	@ 0x51
  8001112:	569b      	ldrsb	r3, [r3, r2]
@@ -2415,7 +2414,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  800113c:	569b      	ldrsb	r3, [r3, r2]
  800113e:	2b00      	cmp	r3, #0
  8001140:	dd15      	ble.n	800116e <update_walls+0x5be>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
  8001142:	687b      	ldr	r3, [r7, #4]
  8001144:	2251      	movs	r2, #81	@ 0x51
  8001146:	569b      	ldrsb	r3, [r3, r2]
@@ -2445,7 +2444,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8001176:	0003      	movs	r3, r0
  8001178:	2b01      	cmp	r3, #1
  800117a:	d12f      	bne.n	80011dc <update_walls+0x62c>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
  800117c:	687b      	ldr	r3, [r7, #4]
  800117e:	2251      	movs	r2, #81	@ 0x51
  8001180:	569b      	ldrsb	r3, [r3, r2]
@@ -2473,7 +2472,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  80011aa:	569b      	ldrsb	r3, [r3, r2]
  80011ac:	2b0e      	cmp	r3, #14
  80011ae:	dc15      	bgt.n	80011dc <update_walls+0x62c>
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
  80011b0:	687b      	ldr	r3, [r7, #4]
  80011b2:	2251      	movs	r2, #81	@ 0x51
  80011b4:	569b      	ldrsb	r3, [r3, r2]
@@ -2503,7 +2502,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  80011e4:	0003      	movs	r3, r0
  80011e6:	2b01      	cmp	r3, #1
  80011e8:	d12c      	bne.n	8001244 <update_walls+0x694>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
  80011ea:	687b      	ldr	r3, [r7, #4]
  80011ec:	2251      	movs	r2, #81	@ 0x51
  80011ee:	569b      	ldrsb	r3, [r3, r2]
@@ -2529,7 +2528,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8001214:	569b      	ldrsb	r3, [r3, r2]
  8001216:	2b00      	cmp	r3, #0
  8001218:	dd14      	ble.n	8001244 <update_walls+0x694>
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
  800121a:	687b      	ldr	r3, [r7, #4]
  800121c:	2251      	movs	r2, #81	@ 0x51
  800121e:	569b      	ldrsb	r3, [r3, r2]
@@ -2558,7 +2557,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  800124c:	0003      	movs	r3, r0
  800124e:	2b01      	cmp	r3, #1
  8001250:	d12c      	bne.n	80012ac <update_walls+0x6fc>
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
  8001252:	687b      	ldr	r3, [r7, #4]
  8001254:	2251      	movs	r2, #81	@ 0x51
  8001256:	569b      	ldrsb	r3, [r3, r2]
@@ -2586,7 +2585,7 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
  8001280:	569b      	ldrsb	r3, [r3, r2]
  8001282:	2b0e      	cmp	r3, #14
  8001284:	dc12      	bgt.n	80012ac <update_walls+0x6fc>
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
  8001286:	687b      	ldr	r3, [r7, #4]
  8001288:	2251      	movs	r2, #81	@ 0x51
  800128a:	569b      	ldrsb	r3, [r3, r2]

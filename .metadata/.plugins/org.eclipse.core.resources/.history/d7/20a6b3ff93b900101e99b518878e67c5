@@ -485,7 +485,7 @@ void deq(struct Maze *maze)
     maze->q_f++;
 }
 
-void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
+void to_prev_intersection(struct Maze *maze)
 {
 
     for (uint8_t i = 0; i < 16; i++)
@@ -642,21 +642,21 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
                 else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
                          (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
                 {
-                    turn_left(maze,sim_maze);
-                    turn_left(maze,sim_maze);
+                    turn_left(maze);
+                    turn_left(maze);
                 }
                 else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
                          (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
                 {
-                    turn_left(maze,sim_maze);
+                    turn_left(maze);
                 }
                 else
                 {
-                    turn_right(maze,sim_maze);
+                    turn_right(maze);
                 }
 
                 // move forward one step
-                move_forward(maze,sim_maze);
+                move_forward(maze);
             }
 
             // cleanup bfs_visited flags and queue pointers

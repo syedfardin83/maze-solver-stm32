@@ -6,7 +6,6 @@
 #define maze_y_len 3
 #define intersection_stack_max_len 50
 #define bfs_q_max_len 50
-#define path_len 10
 
 
 struct Cell{
@@ -201,6 +200,7 @@ uint8_t SIM_wall_back(struct Maze* maze){
 }
 
 
+
 //	Algorithm functions:
 void update_walls(struct Maze* maze,struct Maze* sim_maze){
     if (maze->orient == 'N')
@@ -208,112 +208,112 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
         // multiple sensors can report walls; check each independently
         if (SIM_wall_left(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
             // symmetric update: neighbor to the west has right wall
             if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
         }
         if (SIM_wall_right(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
             // symmetric update: neighbor to the east has left wall
             if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
             // symmetric update: neighbor to the north has back wall
             if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
         }
         if (SIM_wall_back(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
             // symmetric update: neighbor to the south has front wall
             if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
         }
     }
     else if (maze->orient == 'E')
     {
         if (SIM_wall_left(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
             if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
         }
         if (SIM_wall_right(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
             if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
             if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
         }
         if (SIM_wall_back(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
             if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
         }
     }
     else if (maze->orient == 'S')
     {
         if (SIM_wall_left(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
             if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
         }
         if (SIM_wall_right(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
             if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
             if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
         }
         if (SIM_wall_back(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
             if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
         }
     }
     else if (maze->orient == 'W')
     {
         if (SIM_wall_left(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = true;
             if (maze->curr_cell[1] > 0)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = true;
         }
         if (SIM_wall_right(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = true;
             if (maze->curr_cell[1] < 15)
-                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = true;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = true;
             if (maze->curr_cell[0] > 0)
-                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = true;
         }
         if (SIM_wall_back(sim_maze)==1)
         {
-            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = true;
             if (maze->curr_cell[0] < 15)
-                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = true;
         }
     }
     else
@@ -466,290 +466,6 @@ void turn_right(struct Maze *maze,struct Maze* sim_maze)
 
     update_adjacents(maze);
 }
-
-//	Queue Functions
-void enq(struct Maze *maze)
-{
-    if (maze->q_f == -1)
-        maze->q_f = 0;
-    maze->q_r++;
-    maze->bfs_q[maze->q_r][0] = maze->bfs_loc[0];
-    maze->bfs_q[maze->q_r][1] = maze->bfs_loc[1];
-    // //log("Added to queue: "+std::to_string(bfs_loc[0])+","+std::to_string(bfs_loc[1]));
-}
-
-void deq(struct Maze *maze)
-{
-    maze->bfs_loc[0] = maze->bfs_q[maze->q_f][0];
-    maze->bfs_loc[1] = maze->bfs_q[maze->q_f][1];
-    maze->q_f++;
-}
-
-void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
-{
-
-    for (uint8_t i = 0; i < 16; i++)
-        for (uint8_t j = 0; j < 16; j++)
-        {
-            maze->cells[i][j].bfs_visited = 0;
-            maze->cells[i][j].bfs_parent[0] = -1;
-            maze->cells[i][j].bfs_parent[1] = -1;
-        }
-
-    maze->q_f = -1;
-    maze->q_r = -1;
-
-    // If the top of intersection stack is the current cell, pop it to go to the previous one
-    if (maze->ISLen <= 0)
-    {
-        maze->exploration_done = 1;
-        return;
-    }
-    if (maze->intersection_stack[maze->ISLen - 1][0] == maze->curr_cell[0] &&
-        maze->intersection_stack[maze->ISLen - 1][1] == maze->curr_cell[1])
-    {
-        // pop current intersection since we're already there
-        maze->ISLen = maze->ISLen - 1;
-    }
-    if (maze->ISLen <= 0)
-    {
-        //log("No previous intersection to go to");
-        return;
-    }
-
-    // start BFS from current cell
-    maze->bfs_loc[0] = maze->curr_cell[0];
-    maze->bfs_loc[1] = maze->curr_cell[1];
-
-    // mark start
-    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_visited = 1;
-    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_parent[0] = -1;
-    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_parent[1] = -1;
-
-    enq(maze);
-
-    while (maze->q_r - maze->q_f + 1 > 0)
-    {
-        deq(maze);
-
-        if (maze->bfs_loc[0] == maze->intersection_stack[maze->ISLen - 1][0] &&
-            maze->bfs_loc[1] == maze->intersection_stack[maze->ISLen - 1][1])
-        {
-            // build path from current cell to intersection using bfs_parent
-            int8_t path[path_len][2];
-            int8_t plen = 0;
-
-            // start from target (intersection) and walk parents back to start
-            int8_t tx = maze->intersection_stack[maze->ISLen - 1][0];
-            int8_t ty = maze->intersection_stack[maze->ISLen - 1][1];
-            int8_t aborted = 0;
-            while (!(tx == maze->curr_cell[0] && ty == maze->curr_cell[1]))
-            {
-                path[plen][0] = tx;
-                path[plen][1] = ty;
-                plen++;
-                int8_t px = maze->cells[tx][ty].bfs_parent[0];
-                int8_t py = maze->cells[tx][ty].bfs_parent[1];
-                // safety: if parent not set, abort
-                if (px == -1 && py == -1)
-                {
-                    //log("bfs parent missing, aborting");
-                    aborted = 1;
-                    break;
-                }
-                tx = px;
-                ty = py;
-                // avoid overflow
-                if (plen >= path_len)
-                {
-                    aborted = 1;
-                    break;
-                }
-            }
-
-            if (aborted)
-            {
-                // cleanup and return without moving
-                for (int i = 0; i < 16; i++)
-                    for (int j = 0; j < 16; j++)
-                        maze->cells[i][j].bfs_visited = 0;
-                maze->q_f = -1;
-                maze->q_r = -1;
-                return;
-            }
-
-            // finally add the starting cell
-            path[plen][0] = maze->curr_cell[0];
-            path[plen][1] = maze->curr_cell[1];
-            plen++;
-
-            // path currently: [target, ..., start] -> reverse to [start, ..., target]
-            for (int8_t i = 0; i < plen / 2; i++)
-            {
-                int tx0 = path[i][0];
-                int ty0 = path[i][1];
-                path[i][0] = path[plen - 1 - i][0];
-                path[i][1] = path[plen - 1 - i][1];
-                path[plen - 1 - i][0] = tx0;
-                path[plen - 1 - i][1] = ty0;
-            }
-
-            // follow path from current -> intersection
-            for (int8_t i = 1; i < plen; i++)
-            {
-                int8_t sx = path[i - 1][0];
-                int8_t sy = path[i - 1][1];
-                int8_t dx = path[i][0];
-                int8_t dy = path[i][1];
-
-                // determine required absolute direction
-                char need = 'N';
-                if (dx == sx && dy == sy + 1)
-                    need = 'N';
-                else if (dx == sx + 1 && dy == sy)
-                    need = 'E';
-                else if (dx == sx && dy == sy - 1)
-                    need = 'S';
-                else if (dx == sx - 1 && dy == sy)
-                    need = 'W';
-
-                // verify that planned step is not blocked by a wall in the map
-                int8_t blocked = 0;
-                if (need == 'N' && maze->cells[sx][sy].wallFront)
-                    blocked = 1;
-                if (need == 'E' && maze->cells[sx][sy].wallRight)
-                    blocked = 1;
-                if (need == 'S' && maze->cells[sx][sy].wallBack)
-                    blocked = 1;
-                if (need == 'W' && maze->cells[sx][sy].wallLeft)
-                    blocked = 1;
-                if (blocked==1)
-                {
-                    // cleanup and abort
-                    for (int8_t ii = 0; ii < 16; ii++)
-                        for (int8_t jj = 0; jj < 16; jj++)
-                            maze->cells[ii][jj].bfs_visited = 0;
-                    maze->q_f = -1;
-                    maze->q_r = -1;
-                    return;
-                }
-
-                // turn to required direction using minimal turns
-                if (maze->orient == need)
-                {
-                    // nothing
-                }
-                else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
-                         (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
-                {
-                    turn_left(maze,sim_maze);
-                    turn_left(maze,sim_maze);
-                }
-                else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
-                         (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
-                {
-                    turn_left(maze,sim_maze);
-                }
-                else
-                {
-                    turn_right(maze,sim_maze);
-                }
-
-                // move forward one step
-                move_forward(maze,sim_maze);
-            }
-
-            // cleanup bfs_visited flags and queue pointers
-            for (int8_t i = 0; i < 16; i++)
-                for (int8_t j = 0; j < 16; j++)
-                    maze->cells[i][j].bfs_visited = 0;
-
-            maze->q_f = -1;
-            maze->q_r = -1;
-
-            // pop this intersection from stack
-            maze->n_ways = 0;
-            maze->n_visited = 0;
-            if (SIM_wall_front(sim_maze)==0)
-            {
-                maze->n_ways++;
-                if (maze->front_cell[0] >= 0 && maze->front_cell[0] < 16 &&
-                    maze->front_cell[1] >= 0 && maze->front_cell[1] < 16 &&
-                    maze->cells[maze->front_cell[0]][maze->front_cell[1]].visited)
-                    maze->n_visited++;
-            }
-            if (SIM_wall_left(sim_maze)==0)
-            {
-                maze->n_ways++;
-                if (maze->left_cell[0] >= 0 && maze->left_cell[0] < 16 &&
-                    maze->left_cell[1] >= 0 && maze->left_cell[1] < 16 &&
-                    maze->cells[maze->left_cell[0]][maze->left_cell[1]].visited)
-                    maze->n_visited++;
-            }
-            if (SIM_wall_right(sim_maze)==0)
-            {
-                maze->n_ways++;
-                if (maze->right_cell[0] >= 0 && maze->right_cell[0] < 16 &&
-                    maze->right_cell[1] >= 0 && maze->right_cell[1] < 16 &&
-                    maze->cells[maze->right_cell[0]][maze->right_cell[1]].visited)
-                    maze->n_visited++;
-            }
-            if (maze->n_visited == maze->n_ways)
-            {
-                maze->prev_removed[0] = maze->intersection_stack[maze->ISLen - 1][0];
-                maze->prev_removed[1] = maze->intersection_stack[maze->ISLen - 1][1];
-                maze->ISLen--;
-            }
-            return;
-        }
-
-        if (maze->bfs_loc[0] > 0 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallLeft &&
-            !maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited &&
-            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].visited)
-        {
-            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited = 1;
-            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
-            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
-            maze->bfs_loc[0]--;
-            enq(maze);
-            maze->bfs_loc[0]++;
-        }
-        if (maze->bfs_loc[1] < 15 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallFront &&
-            !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited &&
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].visited)
-        {
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited = 1;
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[0] = maze->bfs_loc[0];
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[1] = maze->bfs_loc[1];
-            maze->bfs_loc[1]++;
-            enq(maze);
-            maze->bfs_loc[1]--;
-        }
-        if (maze->bfs_loc[0] < 15 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallRight &&
-            !maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited &&
-            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].visited)
-        {
-            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited = 1;
-            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
-            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
-            maze->bfs_loc[0]++;
-            enq(maze);
-            maze->bfs_loc[0]--;
-        }
-        if (maze->bfs_loc[1] > 0 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallBack &&
-            !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited &&
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].visited)
-        {
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited = 1;
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[0] = maze->bfs_loc[0];
-            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[1] = maze->bfs_loc[1];
-            maze->bfs_loc[1]--;
-            enq(maze);
-            maze->bfs_loc[1]++;
-        }
-    }
-}
-
 
 RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
