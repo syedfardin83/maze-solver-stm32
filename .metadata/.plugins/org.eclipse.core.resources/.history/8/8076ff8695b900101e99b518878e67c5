@@ -751,79 +751,7 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
 }
 
 void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
-	while (!maze->exploration_done)
-	    {
-	        if (!maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].visited)
-	        {
-	            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].visited = 1;
-	        }
-	        update_adjacents(maze);
-	        update_walls(maze,sim_maze);
 
-	        //  Move ahead if no other route:
-	        if (SIM_wall_front(sim_maze)==0 && SIM_wall_left(sim_maze) && SIM_wall_right(sim_maze)==1)
-	        {
-	            move_forward(maze,sim_maze);
-	        }
-	        else if (SIM_wall_left(sim_maze)==1 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==0)
-	        {
-	            turn_right(maze,sim_maze);
-	            move_forward(maze,sim_maze);
-	        }
-	        else if (SIM_wall_left(sim_maze)==0 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
-	        {
-	            turn_left(maze,sim_maze);
-	            move_forward(maze,sim_maze);
-	        }
-	        //  Dead End
-	        else if (SIM_wall_front(sim_maze)==1 && SIM_wall_left(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
-	        {
-	            // Go back to previous intersection
-	            to_prev_intersection(maze,sim_maze);
-	        }
-	        //  Intersection found
-	        else
-	        {
-	            if (maze->ISLen > 0 && // Add bounds check
-	                (!(maze->intersection_stack[maze->ISLen - 1][0] == maze->curr_cell[0] &&
-	                   maze->intersection_stack[maze->ISLen - 1][1] == maze->curr_cell[1])) &&
-	                (!(maze->curr_cell[0] == maze->prev_removed[0] && maze->curr_cell[1] == maze->prev_removed[1])))
-	            {
-	                maze->intersection_stack[maze->ISLen][0] = maze->curr_cell[0];
-	                maze->intersection_stack[maze->ISLen][1] = maze->curr_cell[1];
-	                maze->ISLen++;
-	            }
-
-	            if (SIM_wall_left(sim_maze)==0 && maze->left_cell[0] >= 0 && maze->left_cell[0] < maze_x_len &&
-	                maze->left_cell[1] >= 0 && maze->left_cell[1] < maze_x_len &&
-	                maze->cells[maze->left_cell[0]][maze->left_cell[1]].visited==0)
-	            {
-	                turn_left(maze,sim_maze);
-	                move_forward(maze,sim_maze);
-	                continue;
-	            }
-	            else if (SIM_wall_front(sim_maze)==0 && maze->front_cell[0] >= 0 && maze->front_cell[0] < maze_y_len &&
-	                     maze->front_cell[1] >= 0 && maze->front_cell[1] < maze_y_len &&
-	                     maze->cells[maze->front_cell[0]][maze->front_cell[1]].visited==0)
-	            {
-	                move_forward(maze,sim_maze);
-	                continue;
-	            }
-	            else if (SIM_wall_right(sim_maze)==0 && maze->right_cell[0] >= 0 && maze->right_cell[0] < maze_x_len &&
-	                     maze->right_cell[1] >= 0 && maze->right_cell[1] < maze_x_len &&
-	                     maze->cells[maze->right_cell[0]][maze->right_cell[1]].visited==0)
-	            {
-	                turn_right(maze,sim_maze);
-	                move_forward(maze,sim_maze);
-	                continue;
-	            }
-	            else
-	            {
-	                // Go back to previous intersection
-	                to_prev_intersection(maze,sim_maze);
-	            }
-	        }
-	    }
 }
 
 RTC_HandleTypeDef hrtc;

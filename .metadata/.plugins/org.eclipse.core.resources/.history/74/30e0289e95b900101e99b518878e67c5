@@ -763,17 +763,17 @@ void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
 	        //  Move ahead if no other route:
 	        if (SIM_wall_front(sim_maze)==0 && SIM_wall_left(sim_maze) && SIM_wall_right(sim_maze)==1)
 	        {
-	            move_forward(maze,sim_maze);
+	            move_forward(maze);
 	        }
 	        else if (SIM_wall_left(sim_maze)==1 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==0)
 	        {
-	            turn_right(maze,sim_maze);
-	            move_forward(maze,sim_maze);
+	            turn_right(maze);
+	            move_forward(maze);
 	        }
 	        else if (SIM_wall_left(sim_maze)==0 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
 	        {
-	            turn_left(maze,sim_maze);
-	            move_forward(maze,sim_maze);
+	            turn_left(maze);
+	            move_forward(maze);
 	        }
 	        //  Dead End
 	        else if (SIM_wall_front(sim_maze)==1 && SIM_wall_left(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
