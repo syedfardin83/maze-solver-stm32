@@ -1278,4 +1278,3 @@ maze->cells[15][15].wallLeft = 0;
 maze->cells[15][15].wallBack = 0;
 maze->cells[15][15].wallRight = 1;
 maze->cells[15][15].wallFront = 1;
-

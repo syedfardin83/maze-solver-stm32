@@ -2378,12 +2378,11 @@ int main(void)
 
 
   struct Maze sim_maze;
-  Maze(&sim_maze,7,7);
-//  Maze_SIM(&sim_maze);
-  Maze_SIM_16x16(&sim_maze);
+  Maze(&sim_maze,0,2);
+  Maze_SIM(&sim_maze);
 
   struct Maze maze;
-  Maze(&maze,7,7);
+  Maze(&maze,0,2);
 
   int a = 1;
   DFS_explore(&maze,&sim_maze);
