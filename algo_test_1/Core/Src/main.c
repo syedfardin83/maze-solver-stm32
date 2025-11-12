@@ -9,6 +9,16 @@
 #define path_len 256
 // destination coordinates...?
 
+//Timing variables
+uint32_t dfs_start_time = 0;
+uint32_t dfs_end_time = 0;
+uint32_t dfs_time = 0;
+
+uint32_t ff_start_time = 0;
+uint32_t ff_end_time = 0;
+uint32_t ff_time = 0;
+
+uint32_t total_time = 0;
 
 struct Cell{
 	uint8_t wallLeft;
@@ -2435,11 +2445,18 @@ int main(void)
   struct Maze maze;
   Maze(&maze,7,7);
 
-  int a = 1;
+  dfs_start_time = HAL_GetTick();
   DFS_explore(&maze,&sim_maze);
-  a++;
-  a++;
+  dfs_end_time = HAL_GetTick();
+
+  ff_start_time = HAL_GetTick();
   flood_fill(&maze,&sim_maze);
+  ff_end_time = HAL_GetTick();
+
+  dfs_time = dfs_end_time = dfs_start_time;
+  ff_time = ff_end_time = ff_start_time;
+
+  total_time = dfs_time+ff_time;
 
 
   while (1)
