@@ -4,9 +4,9 @@
 //	General purpose variables:
 #define maze_x_len 16
 #define maze_y_len 16
-#define intersection_stack_max_len 100
-#define bfs_q_max_len 100
-#define path_len 50
+#define intersection_stack_max_len 50
+#define bfs_q_max_len 256
+#define path_len 256
 // destination coordinates...?
 
 
@@ -50,7 +50,7 @@ struct Maze{
 	int8_t ISLen;
 
 	uint8_t bfs_q[bfs_q_max_len][2];
-	int8_t q_r,q_f;
+	int32_t q_r,q_f;
 	int8_t bfs_loc[2];
 
 	int8_t n_ways;
@@ -102,7 +102,7 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
     maze->dest[0] = destx;
     maze->dest[1] = desty;
 
-    maze->orient = 'N';
+    maze->orient = 'E';
 
     //cells constructor:
     for(int i=0;i<maze_x_len;i++){
@@ -1453,8 +1453,6 @@ void Maze_SIM_16x16(struct Maze* maze){
 	maze->cells[15][15].wallBack = 0;
 	maze->cells[15][15].wallRight = 1;
 	maze->cells[15][15].wallFront = 1;
-
-
 }
 
 void SIM_move_forward(struct Maze* maze){
@@ -1520,12 +1518,18 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
         }
+        else if(SIM_wall_left(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             // symmetric update: neighbor to the east has left wall
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }
+        else if(SIM_wall_right(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
@@ -1534,12 +1538,18 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
         }
+        else if(SIM_wall_front(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             // symmetric update: neighbor to the south has front wall
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }
+        else if(SIM_wall_back(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
         }
     }
     else if (maze->orient == 'E')
@@ -1550,23 +1560,36 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+        }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
     }
     else if (maze->orient == 'S')
@@ -1577,23 +1600,34 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
         }
     }
     else if (maze->orient == 'W')
@@ -1603,24 +1637,36 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
         }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
             if (maze->curr_cell[1] < maze_y_len - 1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+
         }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             if (maze->curr_cell[0] < maze_x_len - 1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
         }
     }
     else
@@ -1848,8 +1894,8 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
             maze->bfs_loc[1] == maze->intersection_stack[maze->ISLen - 1][1])
         {
             // build path from current cell to intersection using bfs_parent
-            int8_t path[path_len][2];
-            int8_t plen = 0;
+//            int8_t path[path_len][2];
+            maze->plen = 0;
 
             // start from target (intersection) and walk parents back to start
             int8_t tx = maze->intersection_stack[maze->ISLen - 1][0];
@@ -1857,9 +1903,9 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
             int8_t aborted = 0;
             while (!(tx == maze->curr_cell[0] && ty == maze->curr_cell[1]))
             {
-                path[plen][0] = tx;
-                path[plen][1] = ty;
-                plen++;
+                maze->path[maze->plen][0] = tx;
+                maze->path[maze->plen][1] = ty;
+                maze->plen++;
                 int8_t px = maze->cells[tx][ty].bfs_parent[0];
                 int8_t py = maze->cells[tx][ty].bfs_parent[1];
                 // safety: if parent not set, abort
@@ -1872,7 +1918,7 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
                 tx = px;
                 ty = py;
                 // avoid overflow
-                if (plen >= path_len)
+                if (maze->plen >= path_len)
                 {
                     aborted = 1;
                     break;
@@ -1891,28 +1937,28 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
             }
 
             // finally add the starting cell
-            path[plen][0] = maze->curr_cell[0];
-            path[plen][1] = maze->curr_cell[1];
-            plen++;
+            maze->path[maze->plen][0] = maze->curr_cell[0];
+            maze->path[maze->plen][1] = maze->curr_cell[1];
+            maze->plen++;
 
-            // path currently: [target, ..., start] -> reverse to [start, ..., target]
-            for (int8_t i = 0; i < plen / 2; i++)
+            // maze->path currently: [target, ..., start] -> reverse to [start, ..., target]
+            for (int8_t i = 0; i < maze->plen / 2; i++)
             {
-                int tx0 = path[i][0];
-                int ty0 = path[i][1];
-                path[i][0] = path[plen - 1 - i][0];
-                path[i][1] = path[plen - 1 - i][1];
-                path[plen - 1 - i][0] = tx0;
-                path[plen - 1 - i][1] = ty0;
+                int tx0 = maze->path[i][0];
+                int ty0 = maze->path[i][1];
+                maze->path[i][0] = maze->path[maze->plen - 1 - i][0];
+                maze->path[i][1] = maze->path[maze->plen - 1 - i][1];
+                maze->path[maze->plen - 1 - i][0] = tx0;
+                maze->path[maze->plen - 1 - i][1] = ty0;
             }
 
-            // follow path from current -> intersection
-            for (int8_t i = 1; i < plen; i++)
+            // follow maze->path from current -> intersection
+            for (int8_t i = 1; i < maze->plen; i++)
             {
-                int8_t sx = path[i - 1][0];
-                int8_t sy = path[i - 1][1];
-                int8_t dx = path[i][0];
-                int8_t dy = path[i][1];
+                int8_t sx = maze->path[i - 1][0];
+                int8_t sy = maze->path[i - 1][1];
+                int8_t dx = maze->path[i][0];
+                int8_t dy = maze->path[i][1];
 
                 // determine required absolute direction
                 char need = 'N';
@@ -2060,6 +2106,7 @@ void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
             maze->bfs_loc[1]++;
         }
     }
+    maze->n_visited = 100;
 }
 
 void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
@@ -2215,12 +2262,15 @@ void flood_fill(struct Maze* maze, struct Maze* sim_maze){
 	        }
 	    }
 
+	    maze->n_visited=200;
 	    //  Create the shortest path
 	    // log("Starting pathfinding from " + std::to_string(curr_cell[0]) + "," + std::to_string(curr_cell[1]) + " to " + std::to_string(dest[0]) + "," + std::to_string(dest[1]));
 
 	    // Build path by following lowest cost neighbors
 
 	    // Start from current position
+        maze->plen = 0;
+
 	    int8_t tx = maze->curr_cell[0];
 	    int8_t ty = maze->curr_cell[1];
 

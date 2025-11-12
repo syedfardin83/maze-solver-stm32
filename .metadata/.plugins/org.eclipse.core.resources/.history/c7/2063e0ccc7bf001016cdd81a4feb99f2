@@ -1,0 +1,2749 @@
+#include "main.h"
+#include <stdbool.h>
+
+//	General purpose variables:
+#define maze_x_len 16
+#define maze_y_len 16
+#define intersection_stack_max_len 50
+#define bfs_q_max_len 50
+#define path_len 50
+// destination coordinates...?
+
+
+struct Cell{
+	uint8_t wallLeft;
+	uint8_t wallRight;
+	uint8_t wallFront;
+	uint8_t wallBack;
+	uint8_t visited;
+
+	uint8_t bfs_visited;
+	int8_t bfs_parent[2];
+
+	int8_t cost;
+
+};
+
+void Cell(struct Cell* cell){
+	cell->wallLeft = 0;
+	cell->wallRight = 0;
+	cell->wallFront = 0;
+	cell->wallBack = 0;
+	cell->visited = 0;
+
+	cell->bfs_visited = 0;
+	cell->cost = 0;
+}
+
+struct Maze{
+	struct Cell cells[maze_x_len][maze_y_len];
+
+	int8_t curr_cell[2];
+	int8_t back_cell[2];
+	int8_t front_cell[2];
+	int8_t left_cell[2];
+	int8_t right_cell[2];
+
+	char orient;
+
+	int8_t intersection_stack[intersection_stack_max_len][2];
+	int8_t ISLen;
+
+	uint8_t bfs_q[bfs_q_max_len][2];
+	int8_t q_r,q_f;
+	int8_t bfs_loc[2];
+
+	int8_t n_ways;
+	int8_t n_visited;
+
+	int8_t prev_removed[2];
+
+	int8_t exploration_done;
+
+	int8_t dest[2];
+
+	int8_t path[path_len][2];
+	int8_t plen;
+
+};
+
+// Function prototypes
+void Cell(struct Cell* cell);
+void Maze(struct Maze* maze, int8_t destx, int8_t desty);
+void Maze_SIM(struct Maze* maze);
+void update_adjacents(struct Maze* maze);
+void update_walls(struct Maze* maze, struct Maze* sim_maze);
+void move_forward(struct Maze* maze, struct Maze* sim_maze);
+void turn_left(struct Maze* maze, struct Maze* sim_maze);
+void turn_right(struct Maze* maze, struct Maze* sim_maze);
+void enq(struct Maze* maze);
+void deq(struct Maze* maze);
+void to_prev_intersection(struct Maze* maze, struct Maze* sim_maze);
+void DFS_explore(struct Maze* maze, struct Maze* sim_maze);
+void flood_fill(struct Maze* maze, struct Maze* sim_maze);
+
+void Maze(struct Maze* maze,int8_t destx,int8_t desty){
+    maze->curr_cell[0] = 0;
+    maze->curr_cell[1] = 0;
+
+    maze->ISLen = 0;
+
+    maze->q_r = -1;  // Should start at -1, not 0
+    maze->q_f = -1;  // Should start at -1, not 0
+
+    maze->n_ways = 0;
+    maze->n_visited = 0;
+
+    maze->prev_removed[0] = -1;
+    maze->prev_removed[1] = -1;
+
+    maze->exploration_done = 0;
+
+    maze->dest[0] = destx;
+    maze->dest[1] = desty;
+
+    maze->orient = 'E';
+
+    //cells constructor:
+    for(int i=0;i<maze_x_len;i++){
+        for(int j=0;j<maze_y_len;j++){
+            Cell(&maze->cells[i][j]);
+        }
+    }
+
+    // Mark starting cell as visited and initialize adjacent cells
+    maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].visited = 1;
+    update_adjacents(maze);
+
+    //	Adding starting point to intersection stack
+    maze->intersection_stack[maze->ISLen][0] = maze->curr_cell[0];
+    maze->intersection_stack[maze->ISLen][1] = maze->curr_cell[1];
+    maze->ISLen++;
+
+    maze->plen = 0;
+};
+
+//	Simulator Functions
+void Maze_SIM(struct Maze* maze){
+	maze->cells[0][0].wallLeft = 1;
+	maze->cells[0][0].wallFront = 0;
+	maze->cells[0][0].wallRight = 1;
+	maze->cells[0][0].wallBack = 1;
+
+	maze->cells[0][1].wallLeft = 1;
+	maze->cells[0][1].wallFront = 1;
+	maze->cells[0][1].wallRight = 0;
+	maze->cells[0][1].wallBack = 0;
+
+	maze->cells[0][2].wallLeft = 1;
+	maze->cells[0][2].wallFront = 1;
+	maze->cells[0][2].wallRight = 0;
+	maze->cells[0][2].wallBack = 1;
+
+	maze->cells[1][0].wallLeft = 1;
+	maze->cells[1][0].wallFront = 1;
+	maze->cells[1][0].wallRight = 1;
+	maze->cells[1][0].wallBack = 1;
+
+	maze->cells[1][1].wallLeft = 0;
+	maze->cells[1][1].wallFront = 1;
+	maze->cells[1][1].wallRight = 0;
+	maze->cells[1][1].wallBack = 1;
+
+	maze->cells[1][2].wallLeft = 0;
+	maze->cells[1][2].wallFront = 1;
+	maze->cells[1][2].wallRight = 0;
+	maze->cells[1][2].wallBack = 1;
+
+	maze->cells[2][0].wallLeft = 1;
+	maze->cells[2][0].wallFront = 0;
+	maze->cells[2][0].wallRight = 1;
+	maze->cells[2][0].wallBack = 1;
+
+	maze->cells[2][1].wallLeft = 0;
+	maze->cells[2][1].wallFront = 0;
+	maze->cells[2][1].wallRight = 1;
+	maze->cells[2][1].wallBack = 0;
+
+	maze->cells[2][2].wallLeft = 0;
+	maze->cells[2][2].wallFront = 1;
+	maze->cells[2][2].wallRight = 1;
+	maze->cells[2][2].wallBack = 0;
+
+}
+
+void Maze_SIM_16x16(struct Maze* maze){
+
+	maze->cells[0][0].wallLeft = 1;
+	maze->cells[0][0].wallBack = 1;
+	maze->cells[0][0].wallRight = 1;
+	maze->cells[0][0].wallFront = 0;
+
+	maze->cells[1][0].wallLeft = 1;
+	maze->cells[1][0].wallBack = 1;
+	maze->cells[1][0].wallRight = 0;
+	maze->cells[1][0].wallFront = 0;
+
+	maze->cells[2][0].wallLeft = 0;
+	maze->cells[2][0].wallBack = 1;
+	maze->cells[2][0].wallRight = 0;
+	maze->cells[2][0].wallFront = 1;
+
+	maze->cells[3][0].wallLeft = 0;
+	maze->cells[3][0].wallBack = 1;
+	maze->cells[3][0].wallRight = 0;
+	maze->cells[3][0].wallFront = 1;
+
+	maze->cells[4][0].wallLeft = 0;
+	maze->cells[4][0].wallBack = 1;
+	maze->cells[4][0].wallRight = 0;
+	maze->cells[4][0].wallFront = 1;
+
+	maze->cells[5][0].wallLeft = 0;
+	maze->cells[5][0].wallBack = 1;
+	maze->cells[5][0].wallRight = 0;
+	maze->cells[5][0].wallFront = 1;
+
+	maze->cells[6][0].wallLeft = 0;
+	maze->cells[6][0].wallBack = 1;
+	maze->cells[6][0].wallRight = 0;
+	maze->cells[6][0].wallFront = 1;
+
+	maze->cells[7][0].wallLeft = 0;
+	maze->cells[7][0].wallBack = 1;
+	maze->cells[7][0].wallRight = 0;
+	maze->cells[7][0].wallFront = 0;
+
+	maze->cells[8][0].wallLeft = 0;
+	maze->cells[8][0].wallBack = 1;
+	maze->cells[8][0].wallRight = 0;
+	maze->cells[8][0].wallFront = 1;
+
+	maze->cells[9][0].wallLeft = 0;
+	maze->cells[9][0].wallBack = 1;
+	maze->cells[9][0].wallRight = 0;
+	maze->cells[9][0].wallFront = 1;
+
+	maze->cells[10][0].wallLeft = 0;
+	maze->cells[10][0].wallBack = 1;
+	maze->cells[10][0].wallRight = 0;
+	maze->cells[10][0].wallFront = 1;
+
+	maze->cells[11][0].wallLeft = 0;
+	maze->cells[11][0].wallBack = 1;
+	maze->cells[11][0].wallRight = 0;
+	maze->cells[11][0].wallFront = 1;
+
+	maze->cells[12][0].wallLeft = 0;
+	maze->cells[12][0].wallBack = 1;
+	maze->cells[12][0].wallRight = 0;
+	maze->cells[12][0].wallFront = 1;
+
+	maze->cells[13][0].wallLeft = 0;
+	maze->cells[13][0].wallBack = 1;
+	maze->cells[13][0].wallRight = 0;
+	maze->cells[13][0].wallFront = 1;
+
+	maze->cells[14][0].wallLeft = 0;
+	maze->cells[14][0].wallBack = 1;
+	maze->cells[14][0].wallRight = 0;
+	maze->cells[14][0].wallFront = 1;
+
+	maze->cells[15][0].wallLeft = 0;
+	maze->cells[15][0].wallBack = 1;
+	maze->cells[15][0].wallRight = 1;
+	maze->cells[15][0].wallFront = 0;
+
+	maze->cells[0][1].wallLeft = 1;
+	maze->cells[0][1].wallBack = 0;
+	maze->cells[0][1].wallRight = 1;
+	maze->cells[0][1].wallFront = 0;
+
+	maze->cells[1][1].wallLeft = 1;
+	maze->cells[1][1].wallBack = 0;
+	maze->cells[1][1].wallRight = 0;
+	maze->cells[1][1].wallFront = 0;
+
+	maze->cells[2][1].wallLeft = 0;
+	maze->cells[2][1].wallBack = 1;
+	maze->cells[2][1].wallRight = 0;
+	maze->cells[2][1].wallFront = 1;
+
+	maze->cells[3][1].wallLeft = 0;
+	maze->cells[3][1].wallBack = 1;
+	maze->cells[3][1].wallRight = 0;
+	maze->cells[3][1].wallFront = 1;
+
+	maze->cells[4][1].wallLeft = 0;
+	maze->cells[4][1].wallBack = 1;
+	maze->cells[4][1].wallRight = 0;
+	maze->cells[4][1].wallFront = 1;
+
+	maze->cells[5][1].wallLeft = 0;
+	maze->cells[5][1].wallBack = 1;
+	maze->cells[5][1].wallRight = 0;
+	maze->cells[5][1].wallFront = 1;
+
+	maze->cells[6][1].wallLeft = 0;
+	maze->cells[6][1].wallBack = 1;
+	maze->cells[6][1].wallRight = 0;
+	maze->cells[6][1].wallFront = 1;
+
+	maze->cells[7][1].wallLeft = 0;
+	maze->cells[7][1].wallBack = 0;
+	maze->cells[7][1].wallRight = 0;
+	maze->cells[7][1].wallFront = 0;
+
+	maze->cells[8][1].wallLeft = 0;
+	maze->cells[8][1].wallBack = 1;
+	maze->cells[8][1].wallRight = 0;
+	maze->cells[8][1].wallFront = 1;
+
+	maze->cells[9][1].wallLeft = 0;
+	maze->cells[9][1].wallBack = 1;
+	maze->cells[9][1].wallRight = 0;
+	maze->cells[9][1].wallFront = 1;
+
+	maze->cells[10][1].wallLeft = 0;
+	maze->cells[10][1].wallBack = 1;
+	maze->cells[10][1].wallRight = 0;
+	maze->cells[10][1].wallFront = 1;
+
+	maze->cells[11][1].wallLeft = 0;
+	maze->cells[11][1].wallBack = 1;
+	maze->cells[11][1].wallRight = 1;
+	maze->cells[11][1].wallFront = 0;
+
+	maze->cells[12][1].wallLeft = 1;
+	maze->cells[12][1].wallBack = 1;
+	maze->cells[12][1].wallRight = 0;
+	maze->cells[12][1].wallFront = 1;
+
+	maze->cells[13][1].wallLeft = 0;
+	maze->cells[13][1].wallBack = 1;
+	maze->cells[13][1].wallRight = 0;
+	maze->cells[13][1].wallFront = 0;
+
+	maze->cells[14][1].wallLeft = 0;
+	maze->cells[14][1].wallBack = 1;
+	maze->cells[14][1].wallRight = 1;
+	maze->cells[14][1].wallFront = 0;
+
+	maze->cells[15][1].wallLeft = 1;
+	maze->cells[15][1].wallBack = 0;
+	maze->cells[15][1].wallRight = 1;
+	maze->cells[15][1].wallFront = 0;
+
+	maze->cells[0][2].wallLeft = 1;
+	maze->cells[0][2].wallBack = 0;
+	maze->cells[0][2].wallRight = 0;
+	maze->cells[0][2].wallFront = 1;
+
+	maze->cells[1][2].wallLeft = 0;
+	maze->cells[1][2].wallBack = 0;
+	maze->cells[1][2].wallRight = 1;
+	maze->cells[1][2].wallFront = 0;
+
+	maze->cells[2][2].wallLeft = 1;
+	maze->cells[2][2].wallBack = 1;
+	maze->cells[2][2].wallRight = 0;
+	maze->cells[2][2].wallFront = 0;
+
+	maze->cells[3][2].wallLeft = 0;
+	maze->cells[3][2].wallBack = 1;
+	maze->cells[3][2].wallRight = 1;
+	maze->cells[3][2].wallFront = 0;
+
+	maze->cells[4][2].wallLeft = 1;
+	maze->cells[4][2].wallBack = 1;
+	maze->cells[4][2].wallRight = 0;
+	maze->cells[4][2].wallFront = 0;
+
+	maze->cells[5][2].wallLeft = 0;
+	maze->cells[5][2].wallBack = 1;
+	maze->cells[5][2].wallRight = 1;
+	maze->cells[5][2].wallFront = 0;
+
+	maze->cells[6][2].wallLeft = 1;
+	maze->cells[6][2].wallBack = 1;
+	maze->cells[6][2].wallRight = 1;
+	maze->cells[6][2].wallFront = 0;
+
+	maze->cells[7][2].wallLeft = 1;
+	maze->cells[7][2].wallBack = 0;
+	maze->cells[7][2].wallRight = 0;
+	maze->cells[7][2].wallFront = 0;
+
+	maze->cells[8][2].wallLeft = 0;
+	maze->cells[8][2].wallBack = 1;
+	maze->cells[8][2].wallRight = 0;
+	maze->cells[8][2].wallFront = 1;
+
+	maze->cells[9][2].wallLeft = 0;
+	maze->cells[9][2].wallBack = 1;
+	maze->cells[9][2].wallRight = 0;
+	maze->cells[9][2].wallFront = 1;
+
+	maze->cells[10][2].wallLeft = 0;
+	maze->cells[10][2].wallBack = 1;
+	maze->cells[10][2].wallRight = 0;
+	maze->cells[10][2].wallFront = 0;
+
+	maze->cells[11][2].wallLeft = 0;
+	maze->cells[11][2].wallBack = 0;
+	maze->cells[11][2].wallRight = 1;
+	maze->cells[11][2].wallFront = 1;
+
+	maze->cells[12][2].wallLeft = 1;
+	maze->cells[12][2].wallBack = 1;
+	maze->cells[12][2].wallRight = 0;
+	maze->cells[12][2].wallFront = 0;
+
+	maze->cells[13][2].wallLeft = 0;
+	maze->cells[13][2].wallBack = 0;
+	maze->cells[13][2].wallRight = 1;
+	maze->cells[13][2].wallFront = 1;
+
+	maze->cells[14][2].wallLeft = 1;
+	maze->cells[14][2].wallBack = 0;
+	maze->cells[14][2].wallRight = 1;
+	maze->cells[14][2].wallFront = 0;
+
+	maze->cells[15][2].wallLeft = 1;
+	maze->cells[15][2].wallBack = 0;
+	maze->cells[15][2].wallRight = 1;
+	maze->cells[15][2].wallFront = 0;
+
+	maze->cells[0][3].wallLeft = 1;
+	maze->cells[0][3].wallBack = 1;
+	maze->cells[0][3].wallRight = 1;
+	maze->cells[0][3].wallFront = 0;
+
+	maze->cells[1][3].wallLeft = 1;
+	maze->cells[1][3].wallBack = 0;
+	maze->cells[1][3].wallRight = 1;
+	maze->cells[1][3].wallFront = 0;
+
+	maze->cells[2][3].wallLeft = 1;
+	maze->cells[2][3].wallBack = 0;
+	maze->cells[2][3].wallRight = 1;
+	maze->cells[2][3].wallFront = 0;
+
+	maze->cells[3][3].wallLeft = 1;
+	maze->cells[3][3].wallBack = 0;
+	maze->cells[3][3].wallRight = 1;
+	maze->cells[3][3].wallFront = 0;
+
+	maze->cells[4][3].wallLeft = 1;
+	maze->cells[4][3].wallBack = 0;
+	maze->cells[4][3].wallRight = 1;
+	maze->cells[4][3].wallFront = 0;
+
+	maze->cells[5][3].wallLeft = 1;
+	maze->cells[5][3].wallBack = 0;
+	maze->cells[5][3].wallRight = 1;
+	maze->cells[5][3].wallFront = 0;
+
+	maze->cells[6][3].wallLeft = 1;
+	maze->cells[6][3].wallBack = 0;
+	maze->cells[6][3].wallRight = 1;
+	maze->cells[6][3].wallFront = 0;
+
+	maze->cells[7][3].wallLeft = 1;
+	maze->cells[7][3].wallBack = 0;
+	maze->cells[7][3].wallRight = 1;
+	maze->cells[7][3].wallFront = 0;
+
+	maze->cells[8][3].wallLeft = 1;
+	maze->cells[8][3].wallBack = 1;
+	maze->cells[8][3].wallRight = 0;
+	maze->cells[8][3].wallFront = 1;
+
+	maze->cells[9][3].wallLeft = 0;
+	maze->cells[9][3].wallBack = 1;
+	maze->cells[9][3].wallRight = 0;
+	maze->cells[9][3].wallFront = 0;
+
+	maze->cells[10][3].wallLeft = 0;
+	maze->cells[10][3].wallBack = 0;
+	maze->cells[10][3].wallRight = 1;
+	maze->cells[10][3].wallFront = 1;
+
+	maze->cells[11][3].wallLeft = 1;
+	maze->cells[11][3].wallBack = 1;
+	maze->cells[11][3].wallRight = 0;
+	maze->cells[11][3].wallFront = 0;
+
+	maze->cells[12][3].wallLeft = 0;
+	maze->cells[12][3].wallBack = 0;
+	maze->cells[12][3].wallRight = 1;
+	maze->cells[12][3].wallFront = 1;
+
+	maze->cells[13][3].wallLeft = 1;
+	maze->cells[13][3].wallBack = 1;
+	maze->cells[13][3].wallRight = 0;
+	maze->cells[13][3].wallFront = 0;
+
+	maze->cells[14][3].wallLeft = 0;
+	maze->cells[14][3].wallBack = 0;
+	maze->cells[14][3].wallRight = 1;
+	maze->cells[14][3].wallFront = 0;
+
+	maze->cells[15][3].wallLeft = 1;
+	maze->cells[15][3].wallBack = 0;
+	maze->cells[15][3].wallRight = 1;
+	maze->cells[15][3].wallFront = 0;
+
+	maze->cells[0][4].wallLeft = 1;
+	maze->cells[0][4].wallBack = 0;
+	maze->cells[0][4].wallRight = 0;
+	maze->cells[0][4].wallFront = 0;
+
+	maze->cells[1][4].wallLeft = 0;
+	maze->cells[1][4].wallBack = 0;
+	maze->cells[1][4].wallRight = 1;
+	maze->cells[1][4].wallFront = 0;
+
+	maze->cells[2][4].wallLeft = 1;
+	maze->cells[2][4].wallBack = 0;
+	maze->cells[2][4].wallRight = 1;
+	maze->cells[2][4].wallFront = 0;
+
+	maze->cells[3][4].wallLeft = 1;
+	maze->cells[3][4].wallBack = 0;
+	maze->cells[3][4].wallRight = 1;
+	maze->cells[3][4].wallFront = 0;
+
+	maze->cells[4][4].wallLeft = 1;
+	maze->cells[4][4].wallBack = 0;
+	maze->cells[4][4].wallRight = 1;
+	maze->cells[4][4].wallFront = 0;
+
+	maze->cells[5][4].wallLeft = 1;
+	maze->cells[5][4].wallBack = 0;
+	maze->cells[5][4].wallRight = 1;
+	maze->cells[5][4].wallFront = 0;
+
+	maze->cells[6][4].wallLeft = 1;
+	maze->cells[6][4].wallBack = 0;
+	maze->cells[6][4].wallRight = 1;
+	maze->cells[6][4].wallFront = 0;
+
+	maze->cells[7][4].wallLeft = 1;
+	maze->cells[7][4].wallBack = 0;
+	maze->cells[7][4].wallRight = 0;
+	maze->cells[7][4].wallFront = 1;
+
+	maze->cells[8][4].wallLeft = 0;
+	maze->cells[8][4].wallBack = 1;
+	maze->cells[8][4].wallRight = 0;
+	maze->cells[8][4].wallFront = 0;
+
+	maze->cells[9][4].wallLeft = 0;
+	maze->cells[9][4].wallBack = 0;
+	maze->cells[9][4].wallRight = 1;
+	maze->cells[9][4].wallFront = 1;
+
+	maze->cells[10][4].wallLeft = 1;
+	maze->cells[10][4].wallBack = 1;
+	maze->cells[10][4].wallRight = 0;
+	maze->cells[10][4].wallFront = 0;
+
+	maze->cells[11][4].wallLeft = 0;
+	maze->cells[11][4].wallBack = 0;
+	maze->cells[11][4].wallRight = 1;
+	maze->cells[11][4].wallFront = 1;
+
+	maze->cells[12][4].wallLeft = 1;
+	maze->cells[12][4].wallBack = 1;
+	maze->cells[12][4].wallRight = 0;
+	maze->cells[12][4].wallFront = 0;
+
+	maze->cells[13][4].wallLeft = 0;
+	maze->cells[13][4].wallBack = 0;
+	maze->cells[13][4].wallRight = 1;
+	maze->cells[13][4].wallFront = 1;
+
+	maze->cells[14][4].wallLeft = 1;
+	maze->cells[14][4].wallBack = 0;
+	maze->cells[14][4].wallRight = 1;
+	maze->cells[14][4].wallFront = 0;
+
+	maze->cells[15][4].wallLeft = 1;
+	maze->cells[15][4].wallBack = 0;
+	maze->cells[15][4].wallRight = 1;
+	maze->cells[15][4].wallFront = 0;
+
+	maze->cells[0][5].wallLeft = 1;
+	maze->cells[0][5].wallBack = 0;
+	maze->cells[0][5].wallRight = 1;
+	maze->cells[0][5].wallFront = 0;
+
+	maze->cells[1][5].wallLeft = 1;
+	maze->cells[1][5].wallBack = 0;
+	maze->cells[1][5].wallRight = 0;
+	maze->cells[1][5].wallFront = 0;
+
+	maze->cells[2][5].wallLeft = 0;
+	maze->cells[2][5].wallBack = 0;
+	maze->cells[2][5].wallRight = 1;
+	maze->cells[2][5].wallFront = 0;
+
+	maze->cells[3][5].wallLeft = 1;
+	maze->cells[3][5].wallBack = 0;
+	maze->cells[3][5].wallRight = 1;
+	maze->cells[3][5].wallFront = 0;
+
+	maze->cells[4][5].wallLeft = 1;
+	maze->cells[4][5].wallBack = 0;
+	maze->cells[4][5].wallRight = 1;
+	maze->cells[4][5].wallFront = 0;
+
+	maze->cells[5][5].wallLeft = 1;
+	maze->cells[5][5].wallBack = 0;
+	maze->cells[5][5].wallRight = 1;
+	maze->cells[5][5].wallFront = 0;
+
+	maze->cells[6][5].wallLeft = 1;
+	maze->cells[6][5].wallBack = 0;
+	maze->cells[6][5].wallRight = 0;
+	maze->cells[6][5].wallFront = 1;
+
+	maze->cells[7][5].wallLeft = 0;
+	maze->cells[7][5].wallBack = 1;
+	maze->cells[7][5].wallRight = 1;
+	maze->cells[7][5].wallFront = 0;
+
+	maze->cells[8][5].wallLeft = 1;
+	maze->cells[8][5].wallBack = 0;
+	maze->cells[8][5].wallRight = 1;
+	maze->cells[8][5].wallFront = 0;
+
+	maze->cells[9][5].wallLeft = 1;
+	maze->cells[9][5].wallBack = 1;
+	maze->cells[9][5].wallRight = 0;
+	maze->cells[9][5].wallFront = 0;
+
+	maze->cells[10][5].wallLeft = 0;
+	maze->cells[10][5].wallBack = 0;
+	maze->cells[10][5].wallRight = 1;
+	maze->cells[10][5].wallFront = 1;
+
+	maze->cells[11][5].wallLeft = 1;
+	maze->cells[11][5].wallBack = 1;
+	maze->cells[11][5].wallRight = 0;
+	maze->cells[11][5].wallFront = 0;
+
+	maze->cells[12][5].wallLeft = 0;
+	maze->cells[12][5].wallBack = 0;
+	maze->cells[12][5].wallRight = 0;
+	maze->cells[12][5].wallFront = 0;
+
+	maze->cells[13][5].wallLeft = 0;
+	maze->cells[13][5].wallBack = 1;
+	maze->cells[13][5].wallRight = 0;
+	maze->cells[13][5].wallFront = 1;
+
+	maze->cells[14][5].wallLeft = 0;
+	maze->cells[14][5].wallBack = 0;
+	maze->cells[14][5].wallRight = 1;
+	maze->cells[14][5].wallFront = 0;
+
+	maze->cells[15][5].wallLeft = 1;
+	maze->cells[15][5].wallBack = 0;
+	maze->cells[15][5].wallRight = 1;
+	maze->cells[15][5].wallFront = 0;
+
+	maze->cells[0][6].wallLeft = 1;
+	maze->cells[0][6].wallBack = 0;
+	maze->cells[0][6].wallRight = 1;
+	maze->cells[0][6].wallFront = 0;
+
+	maze->cells[1][6].wallLeft = 1;
+	maze->cells[1][6].wallBack = 0;
+	maze->cells[1][6].wallRight = 1;
+	maze->cells[1][6].wallFront = 0;
+
+	maze->cells[2][6].wallLeft = 1;
+	maze->cells[2][6].wallBack = 0;
+	maze->cells[2][6].wallRight = 1;
+	maze->cells[2][6].wallFront = 0;
+
+	maze->cells[3][6].wallLeft = 1;
+	maze->cells[3][6].wallBack = 0;
+	maze->cells[3][6].wallRight = 1;
+	maze->cells[3][6].wallFront = 0;
+
+	maze->cells[4][6].wallLeft = 1;
+	maze->cells[4][6].wallBack = 0;
+	maze->cells[4][6].wallRight = 1;
+	maze->cells[4][6].wallFront = 0;
+
+	maze->cells[5][6].wallLeft = 1;
+	maze->cells[5][6].wallBack = 0;
+	maze->cells[5][6].wallRight = 0;
+	maze->cells[5][6].wallFront = 1;
+
+	maze->cells[6][6].wallLeft = 0;
+	maze->cells[6][6].wallBack = 1;
+	maze->cells[6][6].wallRight = 1;
+	maze->cells[6][6].wallFront = 0;
+
+	maze->cells[7][6].wallLeft = 1;
+	maze->cells[7][6].wallBack = 0;
+	maze->cells[7][6].wallRight = 0;
+	maze->cells[7][6].wallFront = 1;
+
+	maze->cells[8][6].wallLeft = 0;
+	maze->cells[8][6].wallBack = 0;
+	maze->cells[8][6].wallRight = 0;
+	maze->cells[8][6].wallFront = 1;
+
+	maze->cells[9][6].wallLeft = 0;
+	maze->cells[9][6].wallBack = 0;
+	maze->cells[9][6].wallRight = 1;
+	maze->cells[9][6].wallFront = 1;
+
+	maze->cells[10][6].wallLeft = 1;
+	maze->cells[10][6].wallBack = 1;
+	maze->cells[10][6].wallRight = 0;
+	maze->cells[10][6].wallFront = 0;
+
+	maze->cells[11][6].wallLeft = 0;
+	maze->cells[11][6].wallBack = 0;
+	maze->cells[11][6].wallRight = 1;
+	maze->cells[11][6].wallFront = 1;
+
+	maze->cells[12][6].wallLeft = 1;
+	maze->cells[12][6].wallBack = 0;
+	maze->cells[12][6].wallRight = 1;
+	maze->cells[12][6].wallFront = 0;
+
+	maze->cells[13][6].wallLeft = 1;
+	maze->cells[13][6].wallBack = 1;
+	maze->cells[13][6].wallRight = 1;
+	maze->cells[13][6].wallFront = 0;
+
+	maze->cells[14][6].wallLeft = 1;
+	maze->cells[14][6].wallBack = 0;
+	maze->cells[14][6].wallRight = 1;
+	maze->cells[14][6].wallFront = 0;
+
+	maze->cells[15][6].wallLeft = 1;
+	maze->cells[15][6].wallBack = 0;
+	maze->cells[15][6].wallRight = 1;
+	maze->cells[15][6].wallFront = 0;
+
+	maze->cells[0][7].wallLeft = 1;
+	maze->cells[0][7].wallBack = 0;
+	maze->cells[0][7].wallRight = 1;
+	maze->cells[0][7].wallFront = 0;
+
+	maze->cells[1][7].wallLeft = 1;
+	maze->cells[1][7].wallBack = 0;
+	maze->cells[1][7].wallRight = 1;
+	maze->cells[1][7].wallFront = 0;
+
+	maze->cells[2][7].wallLeft = 1;
+	maze->cells[2][7].wallBack = 0;
+	maze->cells[2][7].wallRight = 1;
+	maze->cells[2][7].wallFront = 0;
+
+	maze->cells[3][7].wallLeft = 1;
+	maze->cells[3][7].wallBack = 0;
+	maze->cells[3][7].wallRight = 1;
+	maze->cells[3][7].wallFront = 0;
+
+	maze->cells[4][7].wallLeft = 1;
+	maze->cells[4][7].wallBack = 0;
+	maze->cells[4][7].wallRight = 0;
+	maze->cells[4][7].wallFront = 1;
+
+	maze->cells[5][7].wallLeft = 0;
+	maze->cells[5][7].wallBack = 1;
+	maze->cells[5][7].wallRight = 1;
+	maze->cells[5][7].wallFront = 0;
+
+	maze->cells[6][7].wallLeft = 1;
+	maze->cells[6][7].wallBack = 0;
+	maze->cells[6][7].wallRight = 0;
+	maze->cells[6][7].wallFront = 1;
+
+	maze->cells[7][7].wallLeft = 0;
+	maze->cells[7][7].wallBack = 1;
+	maze->cells[7][7].wallRight = 0;
+	maze->cells[7][7].wallFront = 0;
+
+	maze->cells[8][7].wallLeft = 0;
+	maze->cells[8][7].wallBack = 1;
+	maze->cells[8][7].wallRight = 1;
+	maze->cells[8][7].wallFront = 0;
+
+	maze->cells[9][7].wallLeft = 1;
+	maze->cells[9][7].wallBack = 1;
+	maze->cells[9][7].wallRight = 0;
+	maze->cells[9][7].wallFront = 0;
+
+	maze->cells[10][7].wallLeft = 0;
+	maze->cells[10][7].wallBack = 0;
+	maze->cells[10][7].wallRight = 0;
+	maze->cells[10][7].wallFront = 1;
+
+	maze->cells[11][7].wallLeft = 0;
+	maze->cells[11][7].wallBack = 1;
+	maze->cells[11][7].wallRight = 1;
+	maze->cells[11][7].wallFront = 1;
+
+	maze->cells[12][7].wallLeft = 1;
+	maze->cells[12][7].wallBack = 0;
+	maze->cells[12][7].wallRight = 0;
+	maze->cells[12][7].wallFront = 1;
+
+	maze->cells[13][7].wallLeft = 0;
+	maze->cells[13][7].wallBack = 0;
+	maze->cells[13][7].wallRight = 0;
+	maze->cells[13][7].wallFront = 1;
+
+	maze->cells[14][7].wallLeft = 0;
+	maze->cells[14][7].wallBack = 0;
+	maze->cells[14][7].wallRight = 1;
+	maze->cells[14][7].wallFront = 0;
+
+	maze->cells[15][7].wallLeft = 1;
+	maze->cells[15][7].wallBack = 0;
+	maze->cells[15][7].wallRight = 1;
+	maze->cells[15][7].wallFront = 0;
+
+	maze->cells[0][8].wallLeft = 1;
+	maze->cells[0][8].wallBack = 0;
+	maze->cells[0][8].wallRight = 1;
+	maze->cells[0][8].wallFront = 0;
+
+	maze->cells[1][8].wallLeft = 1;
+	maze->cells[1][8].wallBack = 0;
+	maze->cells[1][8].wallRight = 0;
+	maze->cells[1][8].wallFront = 1;
+
+	maze->cells[2][8].wallLeft = 0;
+	maze->cells[2][8].wallBack = 0;
+	maze->cells[2][8].wallRight = 1;
+	maze->cells[2][8].wallFront = 1;
+
+	maze->cells[3][8].wallLeft = 1;
+	maze->cells[3][8].wallBack = 0;
+	maze->cells[3][8].wallRight = 1;
+	maze->cells[3][8].wallFront = 0;
+
+	maze->cells[4][8].wallLeft = 1;
+	maze->cells[4][8].wallBack = 1;
+	maze->cells[4][8].wallRight = 0;
+	maze->cells[4][8].wallFront = 0;
+
+	maze->cells[5][8].wallLeft = 0;
+	maze->cells[5][8].wallBack = 0;
+	maze->cells[5][8].wallRight = 0;
+	maze->cells[5][8].wallFront = 1;
+
+	maze->cells[6][8].wallLeft = 0;
+	maze->cells[6][8].wallBack = 1;
+	maze->cells[6][8].wallRight = 1;
+	maze->cells[6][8].wallFront = 1;
+
+	maze->cells[7][8].wallLeft = 1;
+	maze->cells[7][8].wallBack = 0;
+	maze->cells[7][8].wallRight = 0;
+	maze->cells[7][8].wallFront = 1;
+
+	maze->cells[8][8].wallLeft = 0;
+	maze->cells[8][8].wallBack = 0;
+	maze->cells[8][8].wallRight = 1;
+	maze->cells[8][8].wallFront = 1;
+
+	maze->cells[9][8].wallLeft = 1;
+	maze->cells[9][8].wallBack = 0;
+	maze->cells[9][8].wallRight = 1;
+	maze->cells[9][8].wallFront = 1;
+
+	maze->cells[10][8].wallLeft = 1;
+	maze->cells[10][8].wallBack = 1;
+	maze->cells[10][8].wallRight = 0;
+	maze->cells[10][8].wallFront = 0;
+
+	maze->cells[11][8].wallLeft = 0;
+	maze->cells[11][8].wallBack = 1;
+	maze->cells[11][8].wallRight = 0;
+	maze->cells[11][8].wallFront = 1;
+
+	maze->cells[12][8].wallLeft = 0;
+	maze->cells[12][8].wallBack = 1;
+	maze->cells[12][8].wallRight = 0;
+	maze->cells[12][8].wallFront = 1;
+
+	maze->cells[13][8].wallLeft = 0;
+	maze->cells[13][8].wallBack = 1;
+	maze->cells[13][8].wallRight = 1;
+	maze->cells[13][8].wallFront = 0;
+
+	maze->cells[14][8].wallLeft = 1;
+	maze->cells[14][8].wallBack = 0;
+	maze->cells[14][8].wallRight = 1;
+	maze->cells[14][8].wallFront = 0;
+
+	maze->cells[15][8].wallLeft = 1;
+	maze->cells[15][8].wallBack = 0;
+	maze->cells[15][8].wallRight = 1;
+	maze->cells[15][8].wallFront = 0;
+
+	maze->cells[0][9].wallLeft = 1;
+	maze->cells[0][9].wallBack = 0;
+	maze->cells[0][9].wallRight = 0;
+	maze->cells[0][9].wallFront = 1;
+
+	maze->cells[1][9].wallLeft = 0;
+	maze->cells[1][9].wallBack = 1;
+	maze->cells[1][9].wallRight = 0;
+	maze->cells[1][9].wallFront = 1;
+
+	maze->cells[2][9].wallLeft = 0;
+	maze->cells[2][9].wallBack = 1;
+	maze->cells[2][9].wallRight = 1;
+	maze->cells[2][9].wallFront = 1;
+
+	maze->cells[3][9].wallLeft = 1;
+	maze->cells[3][9].wallBack = 0;
+	maze->cells[3][9].wallRight = 1;
+	maze->cells[3][9].wallFront = 0;
+
+	maze->cells[4][9].wallLeft = 1;
+	maze->cells[4][9].wallBack = 0;
+	maze->cells[4][9].wallRight = 0;
+	maze->cells[4][9].wallFront = 1;
+
+	maze->cells[5][9].wallLeft = 0;
+	maze->cells[5][9].wallBack = 1;
+	maze->cells[5][9].wallRight = 1;
+	maze->cells[5][9].wallFront = 0;
+
+	maze->cells[6][9].wallLeft = 1;
+	maze->cells[6][9].wallBack = 1;
+	maze->cells[6][9].wallRight = 1;
+	maze->cells[6][9].wallFront = 0;
+
+	maze->cells[7][9].wallLeft = 1;
+	maze->cells[7][9].wallBack = 1;
+	maze->cells[7][9].wallRight = 0;
+	maze->cells[7][9].wallFront = 0;
+
+	maze->cells[8][9].wallLeft = 0;
+	maze->cells[8][9].wallBack = 1;
+	maze->cells[8][9].wallRight = 0;
+	maze->cells[8][9].wallFront = 1;
+
+	maze->cells[9][9].wallLeft = 0;
+	maze->cells[9][9].wallBack = 1;
+	maze->cells[9][9].wallRight = 0;
+	maze->cells[9][9].wallFront = 1;
+
+	maze->cells[10][9].wallLeft = 0;
+	maze->cells[10][9].wallBack = 0;
+	maze->cells[10][9].wallRight = 1;
+	maze->cells[10][9].wallFront = 1;
+
+	maze->cells[11][9].wallLeft = 1;
+	maze->cells[11][9].wallBack = 1;
+	maze->cells[11][9].wallRight = 0;
+	maze->cells[11][9].wallFront = 0;
+
+	maze->cells[12][9].wallLeft = 0;
+	maze->cells[12][9].wallBack = 1;
+	maze->cells[12][9].wallRight = 0;
+	maze->cells[12][9].wallFront = 1;
+
+	maze->cells[13][9].wallLeft = 0;
+	maze->cells[13][9].wallBack = 0;
+	maze->cells[13][9].wallRight = 1;
+	maze->cells[13][9].wallFront = 1;
+
+	maze->cells[14][9].wallLeft = 1;
+	maze->cells[14][9].wallBack = 0;
+	maze->cells[14][9].wallRight = 1;
+	maze->cells[14][9].wallFront = 1;
+
+	maze->cells[15][9].wallLeft = 1;
+	maze->cells[15][9].wallBack = 0;
+	maze->cells[15][9].wallRight = 1;
+	maze->cells[15][9].wallFront = 0;
+
+	maze->cells[0][10].wallLeft = 1;
+	maze->cells[0][10].wallBack = 1;
+	maze->cells[0][10].wallRight = 0;
+	maze->cells[0][10].wallFront = 0;
+
+	maze->cells[1][10].wallLeft = 0;
+	maze->cells[1][10].wallBack = 1;
+	maze->cells[1][10].wallRight = 0;
+	maze->cells[1][10].wallFront = 1;
+
+	maze->cells[2][10].wallLeft = 0;
+	maze->cells[2][10].wallBack = 1;
+	maze->cells[2][10].wallRight = 0;
+	maze->cells[2][10].wallFront = 1;
+
+	maze->cells[3][10].wallLeft = 0;
+	maze->cells[3][10].wallBack = 0;
+	maze->cells[3][10].wallRight = 1;
+	maze->cells[3][10].wallFront = 1;
+
+	maze->cells[4][10].wallLeft = 1;
+	maze->cells[4][10].wallBack = 1;
+	maze->cells[4][10].wallRight = 1;
+	maze->cells[4][10].wallFront = 0;
+
+	maze->cells[5][10].wallLeft = 1;
+	maze->cells[5][10].wallBack = 0;
+	maze->cells[5][10].wallRight = 1;
+	maze->cells[5][10].wallFront = 0;
+
+	maze->cells[6][10].wallLeft = 1;
+	maze->cells[6][10].wallBack = 0;
+	maze->cells[6][10].wallRight = 1;
+	maze->cells[6][10].wallFront = 0;
+
+	maze->cells[7][10].wallLeft = 1;
+	maze->cells[7][10].wallBack = 0;
+	maze->cells[7][10].wallRight = 0;
+	maze->cells[7][10].wallFront = 1;
+
+	maze->cells[8][10].wallLeft = 0;
+	maze->cells[8][10].wallBack = 1;
+	maze->cells[8][10].wallRight = 1;
+	maze->cells[8][10].wallFront = 1;
+
+	maze->cells[9][10].wallLeft = 1;
+	maze->cells[9][10].wallBack = 1;
+	maze->cells[9][10].wallRight = 0;
+	maze->cells[9][10].wallFront = 0;
+
+	maze->cells[10][10].wallLeft = 0;
+	maze->cells[10][10].wallBack = 1;
+	maze->cells[10][10].wallRight = 1;
+	maze->cells[10][10].wallFront = 0;
+
+	maze->cells[11][10].wallLeft = 1;
+	maze->cells[11][10].wallBack = 0;
+	maze->cells[11][10].wallRight = 0;
+	maze->cells[11][10].wallFront = 1;
+
+	maze->cells[12][10].wallLeft = 0;
+	maze->cells[12][10].wallBack = 1;
+	maze->cells[12][10].wallRight = 0;
+	maze->cells[12][10].wallFront = 1;
+
+	maze->cells[13][10].wallLeft = 0;
+	maze->cells[13][10].wallBack = 1;
+	maze->cells[13][10].wallRight = 0;
+	maze->cells[13][10].wallFront = 1;
+
+	maze->cells[14][10].wallLeft = 0;
+	maze->cells[14][10].wallBack = 1;
+	maze->cells[14][10].wallRight = 1;
+	maze->cells[14][10].wallFront = 0;
+
+	maze->cells[15][10].wallLeft = 1;
+	maze->cells[15][10].wallBack = 0;
+	maze->cells[15][10].wallRight = 1;
+	maze->cells[15][10].wallFront = 0;
+
+	maze->cells[0][11].wallLeft = 1;
+	maze->cells[0][11].wallBack = 0;
+	maze->cells[0][11].wallRight = 1;
+	maze->cells[0][11].wallFront = 0;
+
+	maze->cells[1][11].wallLeft = 1;
+	maze->cells[1][11].wallBack = 1;
+	maze->cells[1][11].wallRight = 0;
+	maze->cells[1][11].wallFront = 0;
+
+	maze->cells[2][11].wallLeft = 0;
+	maze->cells[2][11].wallBack = 1;
+	maze->cells[2][11].wallRight = 0;
+	maze->cells[2][11].wallFront = 1;
+
+	maze->cells[3][11].wallLeft = 0;
+	maze->cells[3][11].wallBack = 1;
+	maze->cells[3][11].wallRight = 1;
+	maze->cells[3][11].wallFront = 0;
+
+	maze->cells[4][11].wallLeft = 1;
+	maze->cells[4][11].wallBack = 0;
+	maze->cells[4][11].wallRight = 1;
+	maze->cells[4][11].wallFront = 0;
+
+	maze->cells[5][11].wallLeft = 1;
+	maze->cells[5][11].wallBack = 0;
+	maze->cells[5][11].wallRight = 1;
+	maze->cells[5][11].wallFront = 0;
+
+	maze->cells[6][11].wallLeft = 1;
+	maze->cells[6][11].wallBack = 0;
+	maze->cells[6][11].wallRight = 0;
+	maze->cells[6][11].wallFront = 1;
+
+	maze->cells[7][11].wallLeft = 0;
+	maze->cells[7][11].wallBack = 1;
+	maze->cells[7][11].wallRight = 0;
+	maze->cells[7][11].wallFront = 1;
+
+	maze->cells[8][11].wallLeft = 0;
+	maze->cells[8][11].wallBack = 1;
+	maze->cells[8][11].wallRight = 0;
+	maze->cells[8][11].wallFront = 0;
+
+	maze->cells[9][11].wallLeft = 0;
+	maze->cells[9][11].wallBack = 0;
+	maze->cells[9][11].wallRight = 1;
+	maze->cells[9][11].wallFront = 0;
+
+	maze->cells[10][11].wallLeft = 1;
+	maze->cells[10][11].wallBack = 0;
+	maze->cells[10][11].wallRight = 1;
+	maze->cells[10][11].wallFront = 0;
+
+	maze->cells[11][11].wallLeft = 1;
+	maze->cells[11][11].wallBack = 1;
+	maze->cells[11][11].wallRight = 0;
+	maze->cells[11][11].wallFront = 1;
+
+	maze->cells[12][11].wallLeft = 0;
+	maze->cells[12][11].wallBack = 1;
+	maze->cells[12][11].wallRight = 0;
+	maze->cells[12][11].wallFront = 0;
+
+	maze->cells[13][11].wallLeft = 0;
+	maze->cells[13][11].wallBack = 1;
+	maze->cells[13][11].wallRight = 0;
+	maze->cells[13][11].wallFront = 1;
+
+	maze->cells[14][11].wallLeft = 0;
+	maze->cells[14][11].wallBack = 0;
+	maze->cells[14][11].wallRight = 1;
+	maze->cells[14][11].wallFront = 1;
+
+	maze->cells[15][11].wallLeft = 1;
+	maze->cells[15][11].wallBack = 0;
+	maze->cells[15][11].wallRight = 1;
+	maze->cells[15][11].wallFront = 0;
+
+	maze->cells[0][12].wallLeft = 1;
+	maze->cells[0][12].wallBack = 0;
+	maze->cells[0][12].wallRight = 1;
+	maze->cells[0][12].wallFront = 0;
+
+	maze->cells[1][12].wallLeft = 1;
+	maze->cells[1][12].wallBack = 0;
+	maze->cells[1][12].wallRight = 0;
+	maze->cells[1][12].wallFront = 1;
+
+	maze->cells[2][12].wallLeft = 0;
+	maze->cells[2][12].wallBack = 1;
+	maze->cells[2][12].wallRight = 1;
+	maze->cells[2][12].wallFront = 0;
+
+	maze->cells[3][12].wallLeft = 1;
+	maze->cells[3][12].wallBack = 0;
+	maze->cells[3][12].wallRight = 1;
+	maze->cells[3][12].wallFront = 0;
+
+	maze->cells[4][12].wallLeft = 1;
+	maze->cells[4][12].wallBack = 0;
+	maze->cells[4][12].wallRight = 1;
+	maze->cells[4][12].wallFront = 0;
+
+	maze->cells[5][12].wallLeft = 1;
+	maze->cells[5][12].wallBack = 0;
+	maze->cells[5][12].wallRight = 0;
+	maze->cells[5][12].wallFront = 1;
+
+	maze->cells[6][12].wallLeft = 0;
+	maze->cells[6][12].wallBack = 1;
+	maze->cells[6][12].wallRight = 0;
+	maze->cells[6][12].wallFront = 1;
+
+	maze->cells[7][12].wallLeft = 0;
+	maze->cells[7][12].wallBack = 1;
+	maze->cells[7][12].wallRight = 0;
+	maze->cells[7][12].wallFront = 1;
+
+	maze->cells[8][12].wallLeft = 0;
+	maze->cells[8][12].wallBack = 0;
+	maze->cells[8][12].wallRight = 1;
+	maze->cells[8][12].wallFront = 1;
+
+	maze->cells[9][12].wallLeft = 1;
+	maze->cells[9][12].wallBack = 0;
+	maze->cells[9][12].wallRight = 0;
+	maze->cells[9][12].wallFront = 1;
+
+	maze->cells[10][12].wallLeft = 0;
+	maze->cells[10][12].wallBack = 0;
+	maze->cells[10][12].wallRight = 0;
+	maze->cells[10][12].wallFront = 1;
+
+	maze->cells[11][12].wallLeft = 0;
+	maze->cells[11][12].wallBack = 1;
+	maze->cells[11][12].wallRight = 1;
+	maze->cells[11][12].wallFront = 0;
+
+	maze->cells[12][12].wallLeft = 1;
+	maze->cells[12][12].wallBack = 0;
+	maze->cells[12][12].wallRight = 0;
+	maze->cells[12][12].wallFront = 1;
+
+	maze->cells[13][12].wallLeft = 0;
+	maze->cells[13][12].wallBack = 1;
+	maze->cells[13][12].wallRight = 0;
+	maze->cells[13][12].wallFront = 1;
+
+	maze->cells[14][12].wallLeft = 0;
+	maze->cells[14][12].wallBack = 1;
+	maze->cells[14][12].wallRight = 1;
+	maze->cells[14][12].wallFront = 0;
+
+	maze->cells[15][12].wallLeft = 1;
+	maze->cells[15][12].wallBack = 0;
+	maze->cells[15][12].wallRight = 1;
+	maze->cells[15][12].wallFront = 0;
+
+	maze->cells[0][13].wallLeft = 1;
+	maze->cells[0][13].wallBack = 0;
+	maze->cells[0][13].wallRight = 1;
+	maze->cells[0][13].wallFront = 0;
+
+	maze->cells[1][13].wallLeft = 1;
+	maze->cells[1][13].wallBack = 1;
+	maze->cells[1][13].wallRight = 0;
+	maze->cells[1][13].wallFront = 0;
+
+	maze->cells[2][13].wallLeft = 0;
+	maze->cells[2][13].wallBack = 0;
+	maze->cells[2][13].wallRight = 1;
+	maze->cells[2][13].wallFront = 1;
+
+	maze->cells[3][13].wallLeft = 1;
+	maze->cells[3][13].wallBack = 0;
+	maze->cells[3][13].wallRight = 1;
+	maze->cells[3][13].wallFront = 0;
+
+	maze->cells[4][13].wallLeft = 1;
+	maze->cells[4][13].wallBack = 0;
+	maze->cells[4][13].wallRight = 0;
+	maze->cells[4][13].wallFront = 0;
+
+	maze->cells[5][13].wallLeft = 0;
+	maze->cells[5][13].wallBack = 1;
+	maze->cells[5][13].wallRight = 0;
+	maze->cells[5][13].wallFront = 1;
+
+	maze->cells[6][13].wallLeft = 0;
+	maze->cells[6][13].wallBack = 1;
+	maze->cells[6][13].wallRight = 0;
+	maze->cells[6][13].wallFront = 0;
+
+	maze->cells[7][13].wallLeft = 0;
+	maze->cells[7][13].wallBack = 1;
+	maze->cells[7][13].wallRight = 0;
+	maze->cells[7][13].wallFront = 1;
+
+	maze->cells[8][13].wallLeft = 0;
+	maze->cells[8][13].wallBack = 1;
+	maze->cells[8][13].wallRight = 0;
+	maze->cells[8][13].wallFront = 1;
+
+	maze->cells[9][13].wallLeft = 0;
+	maze->cells[9][13].wallBack = 1;
+	maze->cells[9][13].wallRight = 1;
+	maze->cells[9][13].wallFront = 1;
+
+	maze->cells[10][13].wallLeft = 1;
+	maze->cells[10][13].wallBack = 1;
+	maze->cells[10][13].wallRight = 0;
+	maze->cells[10][13].wallFront = 0;
+
+	maze->cells[11][13].wallLeft = 0;
+	maze->cells[11][13].wallBack = 0;
+	maze->cells[11][13].wallRight = 0;
+	maze->cells[11][13].wallFront = 1;
+
+	maze->cells[12][13].wallLeft = 0;
+	maze->cells[12][13].wallBack = 1;
+	maze->cells[12][13].wallRight = 0;
+	maze->cells[12][13].wallFront = 1;
+
+	maze->cells[13][13].wallLeft = 0;
+	maze->cells[13][13].wallBack = 1;
+	maze->cells[13][13].wallRight = 0;
+	maze->cells[13][13].wallFront = 1;
+
+	maze->cells[14][13].wallLeft = 0;
+	maze->cells[14][13].wallBack = 0;
+	maze->cells[14][13].wallRight = 1;
+	maze->cells[14][13].wallFront = 1;
+
+	maze->cells[15][13].wallLeft = 1;
+	maze->cells[15][13].wallBack = 0;
+	maze->cells[15][13].wallRight = 1;
+	maze->cells[15][13].wallFront = 0;
+
+	maze->cells[0][14].wallLeft = 1;
+	maze->cells[0][14].wallBack = 0;
+	maze->cells[0][14].wallRight = 1;
+	maze->cells[0][14].wallFront = 0;
+
+	maze->cells[1][14].wallLeft = 1;
+	maze->cells[1][14].wallBack = 0;
+	maze->cells[1][14].wallRight = 0;
+	maze->cells[1][14].wallFront = 1;
+
+	maze->cells[2][14].wallLeft = 0;
+	maze->cells[2][14].wallBack = 1;
+	maze->cells[2][14].wallRight = 1;
+	maze->cells[2][14].wallFront = 0;
+
+	maze->cells[3][14].wallLeft = 1;
+	maze->cells[3][14].wallBack = 0;
+	maze->cells[3][14].wallRight = 1;
+	maze->cells[3][14].wallFront = 0;
+
+	maze->cells[4][14].wallLeft = 1;
+	maze->cells[4][14].wallBack = 0;
+	maze->cells[4][14].wallRight = 0;
+	maze->cells[4][14].wallFront = 1;
+
+	maze->cells[5][14].wallLeft = 0;
+	maze->cells[5][14].wallBack = 1;
+	maze->cells[5][14].wallRight = 1;
+	maze->cells[5][14].wallFront = 0;
+
+	maze->cells[6][14].wallLeft = 1;
+	maze->cells[6][14].wallBack = 0;
+	maze->cells[6][14].wallRight = 0;
+	maze->cells[6][14].wallFront = 0;
+
+	maze->cells[7][14].wallLeft = 0;
+	maze->cells[7][14].wallBack = 1;
+	maze->cells[7][14].wallRight = 0;
+	maze->cells[7][14].wallFront = 1;
+
+	maze->cells[8][14].wallLeft = 0;
+	maze->cells[8][14].wallBack = 1;
+	maze->cells[8][14].wallRight = 0;
+	maze->cells[8][14].wallFront = 1;
+
+	maze->cells[9][14].wallLeft = 0;
+	maze->cells[9][14].wallBack = 1;
+	maze->cells[9][14].wallRight = 0;
+	maze->cells[9][14].wallFront = 1;
+
+	maze->cells[10][14].wallLeft = 0;
+	maze->cells[10][14].wallBack = 0;
+	maze->cells[10][14].wallRight = 0;
+	maze->cells[10][14].wallFront = 1;
+
+	maze->cells[11][14].wallLeft = 0;
+	maze->cells[11][14].wallBack = 1;
+	maze->cells[11][14].wallRight = 0;
+	maze->cells[11][14].wallFront = 1;
+
+	maze->cells[12][14].wallLeft = 0;
+	maze->cells[12][14].wallBack = 1;
+	maze->cells[12][14].wallRight = 0;
+	maze->cells[12][14].wallFront = 1;
+
+	maze->cells[13][14].wallLeft = 0;
+	maze->cells[13][14].wallBack = 1;
+	maze->cells[13][14].wallRight = 0;
+	maze->cells[13][14].wallFront = 1;
+
+	maze->cells[14][14].wallLeft = 0;
+	maze->cells[14][14].wallBack = 1;
+	maze->cells[14][14].wallRight = 0;
+	maze->cells[14][14].wallFront = 1;
+
+	maze->cells[15][14].wallLeft = 0;
+	maze->cells[15][14].wallBack = 0;
+	maze->cells[15][14].wallRight = 1;
+	maze->cells[15][14].wallFront = 0;
+
+	maze->cells[0][15].wallLeft = 1;
+	maze->cells[0][15].wallBack = 0;
+	maze->cells[0][15].wallRight = 0;
+	maze->cells[0][15].wallFront = 1;
+
+	maze->cells[1][15].wallLeft = 0;
+	maze->cells[1][15].wallBack = 1;
+	maze->cells[1][15].wallRight = 0;
+	maze->cells[1][15].wallFront = 1;
+
+	maze->cells[2][15].wallLeft = 0;
+	maze->cells[2][15].wallBack = 0;
+	maze->cells[2][15].wallRight = 1;
+	maze->cells[2][15].wallFront = 1;
+
+	maze->cells[3][15].wallLeft = 1;
+	maze->cells[3][15].wallBack = 0;
+	maze->cells[3][15].wallRight = 0;
+	maze->cells[3][15].wallFront = 1;
+
+	maze->cells[4][15].wallLeft = 0;
+	maze->cells[4][15].wallBack = 1;
+	maze->cells[4][15].wallRight = 0;
+	maze->cells[4][15].wallFront = 1;
+
+	maze->cells[5][15].wallLeft = 0;
+	maze->cells[5][15].wallBack = 0;
+	maze->cells[5][15].wallRight = 1;
+	maze->cells[5][15].wallFront = 1;
+
+	maze->cells[6][15].wallLeft = 1;
+	maze->cells[6][15].wallBack = 0;
+	maze->cells[6][15].wallRight = 0;
+	maze->cells[6][15].wallFront = 1;
+
+	maze->cells[7][15].wallLeft = 0;
+	maze->cells[7][15].wallBack = 1;
+	maze->cells[7][15].wallRight = 0;
+	maze->cells[7][15].wallFront = 1;
+
+	maze->cells[8][15].wallLeft = 0;
+	maze->cells[8][15].wallBack = 1;
+	maze->cells[8][15].wallRight = 0;
+	maze->cells[8][15].wallFront = 1;
+
+	maze->cells[9][15].wallLeft = 0;
+	maze->cells[9][15].wallBack = 1;
+	maze->cells[9][15].wallRight = 0;
+	maze->cells[9][15].wallFront = 1;
+
+	maze->cells[10][15].wallLeft = 0;
+	maze->cells[10][15].wallBack = 1;
+	maze->cells[10][15].wallRight = 0;
+	maze->cells[10][15].wallFront = 1;
+
+	maze->cells[11][15].wallLeft = 0;
+	maze->cells[11][15].wallBack = 1;
+	maze->cells[11][15].wallRight = 0;
+	maze->cells[11][15].wallFront = 1;
+
+	maze->cells[12][15].wallLeft = 0;
+	maze->cells[12][15].wallBack = 1;
+	maze->cells[12][15].wallRight = 0;
+	maze->cells[12][15].wallFront = 1;
+
+	maze->cells[13][15].wallLeft = 0;
+	maze->cells[13][15].wallBack = 1;
+	maze->cells[13][15].wallRight = 0;
+	maze->cells[13][15].wallFront = 1;
+
+	maze->cells[14][15].wallLeft = 0;
+	maze->cells[14][15].wallBack = 1;
+	maze->cells[14][15].wallRight = 0;
+	maze->cells[14][15].wallFront = 1;
+
+	maze->cells[15][15].wallLeft = 0;
+	maze->cells[15][15].wallBack = 0;
+	maze->cells[15][15].wallRight = 1;
+	maze->cells[15][15].wallFront = 1;
+}
+
+void SIM_move_forward(struct Maze* maze){
+	if(maze->orient=='N') maze->curr_cell[1]++;
+	else if(maze->orient=='S') maze->curr_cell[1]--;
+	else if(maze->orient=='E') maze->curr_cell[0]++;
+	else if(maze->orient=='W') maze->curr_cell[0]--;
+}
+
+void SIM_turn_right(struct Maze* maze){
+	if(maze->orient=='N') maze->orient='E';
+	else if(maze->orient=='E') maze->orient='S';
+	else if(maze->orient=='S') maze->orient='W';
+	else if(maze->orient=='W') maze->orient='N';
+}
+
+void SIM_turn_left(struct Maze* maze){
+	if(maze->orient=='N') maze->orient='W';
+	else if(maze->orient=='E') maze->orient='N';
+	else if(maze->orient=='S') maze->orient='E';
+	else if(maze->orient=='W') maze->orient='S';
+}
+
+uint8_t SIM_wall_left(struct Maze* maze){
+	if(maze->orient=='N' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft==1) return 1;
+	else if(maze->orient=='E' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront==1) return 1;
+	else if(maze->orient=='S' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight==1) return 1;
+	else if(maze->orient=='W' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack==1) return 1;
+	return 0;
+}
+uint8_t SIM_wall_right(struct Maze* maze){
+	if(maze->orient=='N' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight==1) return 1;
+	else if(maze->orient=='E' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack==1) return 1;
+	else if(maze->orient=='S' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft==1) return 1;
+	else if(maze->orient=='W' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront==1) return 1;
+	return 0;
+}
+uint8_t SIM_wall_front(struct Maze* maze){
+	if(maze->orient=='N' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront==1) return 1;
+	else if(maze->orient=='E' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight==1) return 1;
+	else if(maze->orient=='S' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack==1) return 1;
+	else if(maze->orient=='W' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft==1) return 1;
+	return 0;
+}
+uint8_t SIM_wall_back(struct Maze* maze){
+	if(maze->orient=='N' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack==1) return 1;
+	else if(maze->orient=='E' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft==1) return 1;
+	else if(maze->orient=='S' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront==1) return 1;
+	else if(maze->orient=='W' && maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight==1) return 1;
+	return 0;
+}
+
+
+//	Algorithm functions:
+void update_walls(struct Maze* maze,struct Maze* sim_maze){
+    if (maze->orient == 'N')
+    {
+        // multiple sensors can report walls; check each independently
+        if (SIM_wall_left(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            // symmetric update: neighbor to the west has right wall
+            if (maze->curr_cell[0] > 0)
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }
+        else if(SIM_wall_left(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+        }
+        if (SIM_wall_right(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            // symmetric update: neighbor to the east has left wall
+            if (maze->curr_cell[0] < maze_x_len-1)
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }
+        else if(SIM_wall_right(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+        }
+        if (SIM_wall_front(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            // symmetric update: neighbor to the north has back wall
+            if (maze->curr_cell[1] < maze_y_len-1)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }
+        else if(SIM_wall_front(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
+        if (SIM_wall_back(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            // symmetric update: neighbor to the south has front wall
+            if (maze->curr_cell[1] > 0)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }
+        else if(SIM_wall_back(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+        }
+    }
+    else if (maze->orient == 'E')
+    {
+        if (SIM_wall_left(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            if (maze->curr_cell[1] < maze_y_len-1)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
+        if (SIM_wall_right(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            if (maze->curr_cell[1] > 0)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+        }
+        if (SIM_wall_front(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            if (maze->curr_cell[0] < maze_x_len-1)
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
+        }
+        if (SIM_wall_back(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            if (maze->curr_cell[0] > 0)
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
+        }
+    }
+    else if (maze->orient == 'S')
+    {
+        if (SIM_wall_left(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            if (maze->curr_cell[0] < maze_x_len-1)
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+        }
+        if (SIM_wall_right(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            if (maze->curr_cell[0] > 0)
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
+        }
+        if (SIM_wall_front(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            if (maze->curr_cell[1] > 0)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
+        }
+        if (SIM_wall_back(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            if (maze->curr_cell[1] < maze_y_len-1)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
+    }
+    else if (maze->orient == 'W')
+    {
+        if (SIM_wall_left(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
+            if (maze->curr_cell[1] > 0)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
+        }
+        if (SIM_wall_right(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
+            if (maze->curr_cell[1] < maze_y_len - 1)
+                maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+
+        }
+        if (SIM_wall_front(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
+            if (maze->curr_cell[0] > 0)
+                maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
+        }
+        if (SIM_wall_back(sim_maze)==1)
+        {
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
+            if (maze->curr_cell[0] < maze_x_len - 1)
+                maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
+        }
+    }
+    else
+    {
+        // //log("Error updating walls!");
+    }
+}
+
+void update_adjacents(struct Maze* maze){
+    if (maze->orient == 'N')
+    {
+        maze->left_cell[0] = maze->curr_cell[0] - 1;
+        maze->left_cell[1] = maze->curr_cell[1];
+
+        maze->right_cell[0] = maze->curr_cell[0] + 1;
+        maze->right_cell[1] = maze->curr_cell[1];
+
+        maze->front_cell[0] = maze->curr_cell[0];
+        maze->front_cell[1] = maze->curr_cell[1] + 1;
+
+        maze->back_cell[0] = maze->curr_cell[0];
+        maze->back_cell[1] = maze->curr_cell[1] - 1;
+    }
+    else if (maze->orient == 'E')
+    {
+        maze->left_cell[0] = maze->curr_cell[0];
+        maze->left_cell[1] = maze->curr_cell[1] + 1;
+
+        maze->right_cell[0] = maze->curr_cell[0];
+        maze->right_cell[1] = maze->curr_cell[1] - 1;
+
+        maze->front_cell[0] = maze->curr_cell[0] + 1;
+        maze->front_cell[1] = maze->curr_cell[1];
+
+        maze->back_cell[0] = maze->curr_cell[0] - 1;
+        maze->back_cell[1] = maze->curr_cell[1];
+    }
+    else if (maze->orient == 'S')
+    {
+        maze->left_cell[0] = maze->curr_cell[0] + 1;
+        maze->left_cell[1] = maze->curr_cell[1];
+
+        maze->right_cell[0] = maze->curr_cell[0] - 1;
+        maze->right_cell[1] = maze->curr_cell[1];
+
+        maze->front_cell[0] = maze->curr_cell[0];
+        maze->front_cell[1] = maze->curr_cell[1] - 1;
+
+        maze->back_cell[0] = maze->curr_cell[0];
+        maze->back_cell[1] = maze->curr_cell[1] + 1;
+    }
+    else if (maze->orient == 'W')
+    {
+        maze->left_cell[0] = maze->curr_cell[0];
+        maze->left_cell[1] = maze->curr_cell[1] - 1;
+
+        maze->right_cell[0] = maze->curr_cell[0];
+        maze->right_cell[1] = maze->curr_cell[1] + 1;
+
+        maze->front_cell[0] = maze->curr_cell[0] - 1;
+        maze->front_cell[1] = maze->curr_cell[1];
+
+        maze->back_cell[0] = maze->curr_cell[0] + 1;
+        maze->back_cell[1] = maze->curr_cell[1];
+    }
+    else
+    {
+        // //log("Error updating adjacent cells!");
+    }
+}
+
+void move_forward(struct Maze* maze,struct Maze* sim_maze){
+    SIM_move_forward(sim_maze);
+    // Change virtual position first, then update adjacent cells
+    if (maze->orient == 'N')
+    {
+        maze->curr_cell[1] = maze->curr_cell[1] + 1;
+    }
+    else if (maze->orient == 'E')
+    {
+        maze->curr_cell[0] = maze->curr_cell[0] + 1;
+    }
+    else if (maze->orient == 'S')
+    {
+        maze->curr_cell[1] = maze->curr_cell[1] - 1;
+    }
+    else if (maze->orient == 'W')
+    {
+        maze->curr_cell[0] = maze->curr_cell[0] - 1;
+    }
+    else
+    {
+        //log("Error changing position");
+    }
+
+    update_adjacents(maze);
+}
+
+void turn_left(struct Maze* maze, struct Maze* sim_maze){
+	SIM_turn_left(sim_maze);
+	    // Change orient first, then update adjacent cells
+	    if (maze->orient == 'N')
+	    {
+	        maze->orient = 'W';
+	    }
+	    else if (maze->orient == 'E')
+	    {
+	        maze->orient = 'N';
+	    }
+	    else if (maze->orient == 'S')
+	    {
+	        maze->orient = 'E';
+	    }
+	    else if (maze->orient == 'W')
+	    {
+	        maze->orient = 'S';
+	    }
+	    else
+	    {
+	        // //log("Error turning left!");
+	    }
+
+	    update_adjacents(maze);
+}
+
+void turn_right(struct Maze *maze,struct Maze* sim_maze)
+{
+    SIM_turn_right(sim_maze);
+    // Change orient first, then update adjacent cells
+    if (maze->orient == 'N')
+    {
+        maze->orient = 'E';
+    }
+    else if (maze->orient == 'E')
+    {
+        maze->orient = 'S';
+    }
+    else if (maze->orient == 'S')
+    {
+        maze->orient = 'W';
+    }
+    else if (maze->orient == 'W')
+    {
+        maze->orient = 'N';
+    }
+    else
+    {
+        // //log("Error turning right!");
+    }
+
+    update_adjacents(maze);
+}
+
+//	Queue Functions
+void enq(struct Maze *maze)
+{
+    if (maze->q_f == -1)
+        maze->q_f = 0;
+    if (maze->q_r < bfs_q_max_len - 1) {
+        maze->q_r++;
+        maze->bfs_q[maze->q_r][0] = maze->bfs_loc[0];
+        maze->bfs_q[maze->q_r][1] = maze->bfs_loc[1];
+    }
+    // //log("Added to queue: "+std::to_string(bfs_loc[0])+","+std::to_string(bfs_loc[1]));
+}
+
+void deq(struct Maze *maze)
+{
+    if (maze->q_f <= maze->q_r && maze->q_f >= 0) {
+        maze->bfs_loc[0] = maze->bfs_q[maze->q_f][0];
+        maze->bfs_loc[1] = maze->bfs_q[maze->q_f][1];
+        maze->q_f++;
+    }
+}
+
+void to_prev_intersection(struct Maze *maze,struct Maze *sim_maze)
+{
+
+    for (uint8_t i = 0; i < maze_x_len; i++)
+        for (uint8_t j = 0; j < maze_y_len; j++)
+        {
+            maze->cells[i][j].bfs_visited = 0;
+            maze->cells[i][j].bfs_parent[0] = -1;
+            maze->cells[i][j].bfs_parent[1] = -1;
+        }
+
+    maze->q_f = -1;
+    maze->q_r = -1;
+
+    // If the top of intersection stack is the current cell, pop it to go to the previous one
+    if (maze->ISLen <= 0)
+    {
+        maze->exploration_done = 1;
+        return;
+    }
+    if (maze->intersection_stack[maze->ISLen - 1][0] == maze->curr_cell[0] &&
+        maze->intersection_stack[maze->ISLen - 1][1] == maze->curr_cell[1])
+    {
+        // pop current intersection since we're already there
+        maze->ISLen = maze->ISLen - 1;
+    }
+    if (maze->ISLen <= 0)
+    {
+        //log("No previous intersection to go to");
+        maze->exploration_done = 1;
+        return;
+    }
+
+    // start BFS from current cell
+    maze->bfs_loc[0] = maze->curr_cell[0];
+    maze->bfs_loc[1] = maze->curr_cell[1];
+
+    // mark start
+    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_visited = 1;
+    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_parent[0] = -1;
+    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_parent[1] = -1;
+
+    enq(maze);
+
+    while (maze->q_r - maze->q_f + 1 > 0)
+    {
+        deq(maze);
+
+        if (maze->bfs_loc[0] == maze->intersection_stack[maze->ISLen - 1][0] &&
+            maze->bfs_loc[1] == maze->intersection_stack[maze->ISLen - 1][1])
+        {
+            // build path from current cell to intersection using bfs_parent
+            int8_t path[path_len][2];
+            int8_t plen = 0;
+
+            // start from target (intersection) and walk parents back to start
+            int8_t tx = maze->intersection_stack[maze->ISLen - 1][0];
+            int8_t ty = maze->intersection_stack[maze->ISLen - 1][1];
+            int8_t aborted = 0;
+            while (!(tx == maze->curr_cell[0] && ty == maze->curr_cell[1]))
+            {
+                path[plen][0] = tx;
+                path[plen][1] = ty;
+                plen++;
+                int8_t px = maze->cells[tx][ty].bfs_parent[0];
+                int8_t py = maze->cells[tx][ty].bfs_parent[1];
+                // safety: if parent not set, abort
+                if (px == -1 && py == -1)
+                {
+                    //log("bfs parent missing, aborting");
+                    aborted = 1;
+                    break;
+                }
+                tx = px;
+                ty = py;
+                // avoid overflow
+                if (plen >= path_len)
+                {
+                    aborted = 1;
+                    break;
+                }
+            }
+
+            if (aborted)
+            {
+                // cleanup and return without moving
+                for (int i = 0; i < maze_x_len; i++)
+                    for (int j = 0; j < maze_y_len; j++)
+                        maze->cells[i][j].bfs_visited = 0;
+                maze->q_f = -1;
+                maze->q_r = -1;
+                return;
+            }
+
+            // finally add the starting cell
+            path[plen][0] = maze->curr_cell[0];
+            path[plen][1] = maze->curr_cell[1];
+            plen++;
+
+            // path currently: [target, ..., start] -> reverse to [start, ..., target]
+            for (int8_t i = 0; i < plen / 2; i++)
+            {
+                int tx0 = path[i][0];
+                int ty0 = path[i][1];
+                path[i][0] = path[plen - 1 - i][0];
+                path[i][1] = path[plen - 1 - i][1];
+                path[plen - 1 - i][0] = tx0;
+                path[plen - 1 - i][1] = ty0;
+            }
+
+            // follow path from current -> intersection
+            for (int8_t i = 1; i < plen; i++)
+            {
+                int8_t sx = path[i - 1][0];
+                int8_t sy = path[i - 1][1];
+                int8_t dx = path[i][0];
+                int8_t dy = path[i][1];
+
+                // determine required absolute direction
+                char need = 'N';
+                if (dx == sx && dy == sy + 1)
+                    need = 'N';
+                else if (dx == sx + 1 && dy == sy)
+                    need = 'E';
+                else if (dx == sx && dy == sy - 1)
+                    need = 'S';
+                else if (dx == sx - 1 && dy == sy)
+                    need = 'W';
+
+                // verify that planned step is not blocked by a wall in the map
+                int8_t blocked = 0;
+                if (need == 'N' && maze->cells[sx][sy].wallFront)
+                    blocked = 1;
+                if (need == 'E' && maze->cells[sx][sy].wallRight)
+                    blocked = 1;
+                if (need == 'S' && maze->cells[sx][sy].wallBack)
+                    blocked = 1;
+                if (need == 'W' && maze->cells[sx][sy].wallLeft)
+                    blocked = 1;
+                if (blocked==1)
+                {
+                    // cleanup and abort
+                    for (int8_t ii = 0; ii < maze_x_len; ii++)
+                        for (int8_t jj = 0; jj < maze_y_len; jj++)
+                            maze->cells[ii][jj].bfs_visited = 0;
+                    maze->q_f = -1;
+                    maze->q_r = -1;
+                    return;
+                }
+
+                // turn to required direction using minimal turns
+                if (maze->orient == need)
+                {
+                    // nothing
+                }
+                else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
+                         (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
+                {
+                    turn_left(maze,sim_maze);
+                    turn_left(maze,sim_maze);
+                }
+                else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
+                         (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
+                {
+                    turn_left(maze,sim_maze);
+                }
+                else
+                {
+                    turn_right(maze,sim_maze);
+                }
+
+                // move forward one step
+                move_forward(maze,sim_maze);
+            }
+
+            // cleanup bfs_visited flags and queue pointers
+            for (int8_t i = 0; i < maze_x_len; i++)
+                for (int8_t j = 0; j < maze_y_len; j++)
+                    maze->cells[i][j].bfs_visited = 0;
+
+            maze->q_f = -1;
+            maze->q_r = -1;
+
+            // pop this intersection from stack
+            maze->n_ways = 0;
+            maze->n_visited = 0;
+            if (SIM_wall_front(sim_maze)==0)
+            {
+                maze->n_ways++;
+                if (maze->front_cell[0] >= 0 && maze->front_cell[0] < maze_x_len &&
+                    maze->front_cell[1] >= 0 && maze->front_cell[1] < maze_y_len &&
+                    maze->cells[maze->front_cell[0]][maze->front_cell[1]].visited)
+                    maze->n_visited++;
+            }
+            if (SIM_wall_left(sim_maze)==0)
+            {
+                maze->n_ways++;
+                if (maze->left_cell[0] >= 0 && maze->left_cell[0] < maze_x_len &&
+                    maze->left_cell[1] >= 0 && maze->left_cell[1] < maze_y_len &&
+                    maze->cells[maze->left_cell[0]][maze->left_cell[1]].visited)
+                    maze->n_visited++;
+            }
+            if (SIM_wall_right(sim_maze)==0)
+            {
+                maze->n_ways++;
+                if (maze->right_cell[0] >= 0 && maze->right_cell[0] < maze_x_len &&
+                    maze->right_cell[1] >= 0 && maze->right_cell[1] < maze_y_len &&
+                    maze->cells[maze->right_cell[0]][maze->right_cell[1]].visited)
+                    maze->n_visited++;
+            }
+            if (maze->n_visited == maze->n_ways)
+            {
+                maze->prev_removed[0] = maze->intersection_stack[maze->ISLen - 1][0];
+                maze->prev_removed[1] = maze->intersection_stack[maze->ISLen - 1][1];
+                maze->ISLen--;
+            }
+            return;
+        }
+
+        if (maze->bfs_loc[0] > 0 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallLeft &&
+            !maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited &&
+            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].visited)
+        {
+            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited = 1;
+            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
+            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
+            maze->bfs_loc[0]--;
+            enq(maze);
+            maze->bfs_loc[0]++;
+        }
+        if (maze->bfs_loc[1] < maze_y_len-1 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallFront &&
+            !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited &&
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].visited)
+        {
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited = 1;
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[0] = maze->bfs_loc[0];
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[1] = maze->bfs_loc[1];
+            maze->bfs_loc[1]++;
+            enq(maze);
+            maze->bfs_loc[1]--;
+        }
+        if (maze->bfs_loc[0] < maze_x_len-1 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallRight &&
+            !maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited &&
+            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].visited)
+        {
+            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited = 1;
+            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
+            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
+            maze->bfs_loc[0]++;
+            enq(maze);
+            maze->bfs_loc[0]--;
+        }
+        if (maze->bfs_loc[1] > 0 && !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallBack &&
+            !maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited &&
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].visited)
+        {
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited = 1;
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[0] = maze->bfs_loc[0];
+            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[1] = maze->bfs_loc[1];
+            maze->bfs_loc[1]--;
+            enq(maze);
+            maze->bfs_loc[1]++;
+        }
+    }
+}
+
+void DFS_explore(struct Maze* maze, struct Maze* sim_maze){
+	while (!maze->exploration_done)
+	    {
+	        if (!maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].visited)
+	        {
+	            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].visited = 1;
+	        }
+	        update_adjacents(maze);
+	        update_walls(maze,sim_maze);
+
+	        //  Move ahead if no other route:
+	        if (SIM_wall_front(sim_maze)==0 && SIM_wall_left(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
+	        {
+	            move_forward(maze,sim_maze);
+	        }
+	        else if (SIM_wall_left(sim_maze)==1 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==0)
+	        {
+	            turn_right(maze,sim_maze);
+	            move_forward(maze,sim_maze);
+	        }
+	        else if (SIM_wall_left(sim_maze)==0 && SIM_wall_front(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
+	        {
+	            turn_left(maze,sim_maze);
+	            move_forward(maze,sim_maze);
+	        }
+	        //  Dead End
+	        else if (SIM_wall_front(sim_maze)==1 && SIM_wall_left(sim_maze)==1 && SIM_wall_right(sim_maze)==1)
+	        {
+	            // Go back to previous intersection
+	            to_prev_intersection(maze,sim_maze);
+	        }
+	        //  Intersection found
+	        else
+	        {
+	            if (maze->ISLen > 0 && maze->ISLen < intersection_stack_max_len && // Add bounds check
+	                (!(maze->intersection_stack[maze->ISLen - 1][0] == maze->curr_cell[0] &&
+	                   maze->intersection_stack[maze->ISLen - 1][1] == maze->curr_cell[1])) &&
+	                (!(maze->curr_cell[0] == maze->prev_removed[0] && maze->curr_cell[1] == maze->prev_removed[1])))
+	            {
+	                maze->intersection_stack[maze->ISLen][0] = maze->curr_cell[0];
+	                maze->intersection_stack[maze->ISLen][1] = maze->curr_cell[1];
+	                maze->ISLen++;
+	            }
+
+	            if (SIM_wall_left(sim_maze)==0 && maze->left_cell[0] >= 0 && maze->left_cell[0] < maze_x_len &&
+	                maze->left_cell[1] >= 0 && maze->left_cell[1] < maze_y_len &&
+	                maze->cells[maze->left_cell[0]][maze->left_cell[1]].visited==0)
+	            {
+	                turn_left(maze,sim_maze);
+	                move_forward(maze,sim_maze);
+	                continue;
+	            }
+	            else if (SIM_wall_front(sim_maze)==0 && maze->front_cell[0] >= 0 && maze->front_cell[0] < maze_x_len &&
+	                     maze->front_cell[1] >= 0 && maze->front_cell[1] < maze_y_len &&
+	                     maze->cells[maze->front_cell[0]][maze->front_cell[1]].visited==0)
+	            {
+	                move_forward(maze,sim_maze);
+	                continue;
+	            }
+	            else if (SIM_wall_right(sim_maze)==0 && maze->right_cell[0] >= 0 && maze->right_cell[0] < maze_x_len &&
+	                     maze->right_cell[1] >= 0 && maze->right_cell[1] < maze_y_len &&
+	                     maze->cells[maze->right_cell[0]][maze->right_cell[1]].visited==0)
+	            {
+	                turn_right(maze,sim_maze);
+	                move_forward(maze,sim_maze);
+	                continue;
+	            }
+	            else
+	            {
+	                // Go back to previous intersection
+	                to_prev_intersection(maze,sim_maze);
+	            }
+	        }
+	    }
+}
+
+void flood_fill(struct Maze* maze, struct Maze* sim_maze){
+	   // prepare BFS: clear previous bfs flags/parents and reset queue
+	    for (int8_t i = 0; i < maze_x_len; i++)
+	        for (int8_t j = 0; j < maze_y_len; j++)
+	        {
+	            maze->cells[i][j].bfs_visited = 0;
+	        }
+
+	    maze->q_f = -1;
+	    maze->q_r = -1;
+
+	    maze->bfs_loc[0] = maze->dest[0];
+	    maze->bfs_loc[1] = maze->dest[1];
+
+	    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].bfs_visited = 1;
+	    maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost = 0;
+
+	    enq(maze);
+
+	    while (maze->q_r - maze->q_f + 1 > 0)
+	    {
+	        deq(maze);
+
+	        if (maze->bfs_loc[0] > 0 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallLeft==0 &&
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited==0 &&
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].visited==1)
+	        {
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_visited = 1;
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
+	            maze->cells[maze->bfs_loc[0] - 1][maze->bfs_loc[1]].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
+	            maze->bfs_loc[0]--;
+
+	            enq(maze);
+	            maze->bfs_loc[0]++;
+	        }
+	        if (maze->bfs_loc[1] < maze_y_len-1 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallFront==0 &&
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited==0 &&
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].visited==1)
+	        {
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_visited = 1;
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[0] = maze->bfs_loc[0];
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].bfs_parent[1] = maze->bfs_loc[1];
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] + 1].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
+	            maze->bfs_loc[1]++;
+
+	            enq(maze);
+	            maze->bfs_loc[1]--;
+	        }
+	        if (maze->bfs_loc[0] < maze_x_len-1 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallRight==0 &&
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited==0 &&
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].visited==1)
+	        {
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_visited = 1;
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[0] = maze->bfs_loc[0];
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].bfs_parent[1] = maze->bfs_loc[1];
+	            maze->cells[maze->bfs_loc[0] + 1][maze->bfs_loc[1]].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
+	            maze->bfs_loc[0]++;
+
+	            enq(maze);
+	            maze->bfs_loc[0]--;
+	        }
+	        if (maze->bfs_loc[1] > 0 && maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].wallBack==0 &&
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited==0 &&
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].visited==1)
+	        {
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_visited = 1;
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[0] = maze->bfs_loc[0];
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].bfs_parent[1] = maze->bfs_loc[1];
+	            maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1] - 1].cost = maze->cells[maze->bfs_loc[0]][maze->bfs_loc[1]].cost + 1;
+	            maze->bfs_loc[1]--;
+
+	            enq(maze);
+	            maze->bfs_loc[1]++;
+	        }
+	    }
+
+	    //  Create the shortest path
+	    // log("Starting pathfinding from " + std::to_string(curr_cell[0]) + "," + std::to_string(curr_cell[1]) + " to " + std::to_string(dest[0]) + "," + std::to_string(dest[1]));
+
+	    // Build path by following lowest cost neighbors
+
+	    // Start from current position
+	    int8_t tx = maze->curr_cell[0];
+	    int8_t ty = maze->curr_cell[1];
+
+	    // Add current cell to path
+	    maze->path[maze->plen][0] = tx;
+	    maze->path[maze->plen][1] = ty;
+	    maze->plen++;
+
+	    // Follow path of decreasing costs until we reach destination
+	    while (!(tx == maze->dest[0] && ty == maze->dest[1]))
+	    {
+	        int min_cost = 999;
+	        int8_t next_x = tx;
+	        int8_t next_y = ty;
+	        int8_t found_next = 0;
+
+	        // Check all four neighbors for the one with minimum cost
+	        // Left neighbor
+	        if (tx > 0 && maze->cells[tx][ty].wallLeft==0 && maze->cells[tx - 1][ty].visited==1 && maze->cells[tx - 1][ty].cost < min_cost)
+	        {
+	            min_cost = maze->cells[tx - 1][ty].cost;
+	            next_x = tx - 1;
+	            next_y = ty;
+	            found_next = 1;
+	        }
+	        // Front neighbor (North)
+	        if (ty < maze_y_len-1 && maze->cells[tx][ty].wallFront==0 && maze->cells[tx][ty + 1].visited==1 && maze->cells[tx][ty + 1].cost < min_cost)
+	        {
+	            min_cost = maze->cells[tx][ty + 1].cost;
+	            next_x = tx;
+	            next_y = ty + 1;
+	            found_next = 1;
+	        }
+	        // Right neighbor
+	        if (tx < maze_x_len-1 && maze->cells[tx][ty].wallRight==0 && maze->cells[tx + 1][ty].visited==1 && maze->cells[tx + 1][ty].cost < min_cost)
+	        {
+	            min_cost = maze->cells[tx + 1][ty].cost;
+	            next_x = tx + 1;
+	            next_y = ty;
+	            found_next = 1;
+	        }
+	        // Back neighbor (South)
+	        if (ty > 0 && maze->cells[tx][ty].wallBack==0 && maze->cells[tx][ty - 1].visited==1 && maze->cells[tx][ty - 1].cost < min_cost)
+	        {
+	            min_cost = maze->cells[tx][ty - 1].cost;
+	            next_x = tx;
+	            next_y = ty - 1;
+	            found_next = 1;
+	        }
+
+	        if (found_next==0)
+	        {
+	            // log("No path found to destination!");
+	            return;
+	        }
+
+	        // Move to next cell
+	        tx = next_x;
+	        ty = next_y;
+	        maze->path[maze->plen][0] = tx;
+	        maze->path[maze->plen][1] = ty;
+	        maze->plen++;
+
+	        // Safety check
+	        if (maze->plen >= path_len)
+	        {
+	            // log("Path too long, aborting");
+	            return;
+	        }
+	    }
+
+	    // Execute the path using same logic as to_prev_intersection
+//        for (int8_t i = 1; i < plen; i++)
+//        {
+//            int8_t sx = path[i - 1][0];
+//            int8_t sy = path[i - 1][1];
+//            int8_t dx = path[i][0];
+//            int8_t dy = path[i][1];
+//
+//            // determine required absolute direction
+//            char need = 'N';
+//            if (dx == sx && dy == sy + 1)
+//                need = 'N';
+//            else if (dx == sx + 1 && dy == sy)
+//                need = 'E';
+//            else if (dx == sx && dy == sy - 1)
+//                need = 'S';
+//            else if (dx == sx - 1 && dy == sy)
+//                need = 'W';
+//
+//            // verify that planned step is not blocked by a wall in the map
+//            int8_t blocked = 0;
+//            if (need == 'N' && maze->cells[sx][sy].wallFront)
+//                blocked = 1;
+//            if (need == 'E' && maze->cells[sx][sy].wallRight)
+//                blocked = 1;
+//            if (need == 'S' && maze->cells[sx][sy].wallBack)
+//                blocked = 1;
+//            if (need == 'W' && maze->cells[sx][sy].wallLeft)
+//                blocked = 1;
+//            if (blocked==1)
+//            {
+//                // cleanup and abort
+//                for (int8_t ii = 0; ii < 16; ii++)
+//                    for (int8_t jj = 0; jj < 16; jj++)
+//                        maze->cells[ii][jj].bfs_visited = 0;
+//                maze->q_f = -1;
+//                maze->q_r = -1;
+//                return;
+//            }
+//
+//            // turn to required direction using minimal turns
+//            if (maze->orient == need)
+//            {
+//                // nothing
+//            }
+//            else if ((maze->orient == 'N' && need == 'S') || (maze->orient == 'S' && need == 'N') ||
+//                     (maze->orient == 'E' && need == 'W') || (maze->orient == 'W' && need == 'E'))
+//            {
+//                turn_left(maze,sim_maze);
+//                turn_left(maze,sim_maze);
+//            }
+//            else if ((maze->orient == 'N' && need == 'W') || (maze->orient == 'W' && need == 'S') ||
+//                     (maze->orient == 'S' && need == 'E') || (maze->orient == 'E' && need == 'N'))
+//            {
+//                turn_left(maze,sim_maze);
+//            }
+//            else
+//            {
+//                turn_right(maze,sim_maze);
+//            }
+//
+//            // move forward one step
+//            move_forward(maze,sim_maze);
+//        }
+
+}
+
+RTC_HandleTypeDef hrtc;
+SPI_HandleTypeDef hspi1;
+UART_HandleTypeDef huart2;
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_RTC_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_USART2_UART_Init(void);
+int main(void)
+{
+  HAL_Init();
+  SystemClock_Config();
+  MX_GPIO_Init();
+  MX_RTC_Init();
+  MX_SPI1_Init();
+  MX_USART2_UART_Init();
+
+
+  struct Maze sim_maze;
+  Maze(&sim_maze,7,7);
+//  Maze_SIM(&sim_maze);
+  Maze_SIM_16x16(&sim_maze);
+
+  struct Maze maze;
+  Maze(&maze,7,7);
+
+  int a = 1;
+  DFS_explore(&maze,&sim_maze);
+  a++;
+  a++;
+  flood_fill(&maze,&sim_maze);
+
+
+  while (1)
+  {
+  }
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLLMUL_6;
+  RCC_OscInitStruct.PLL.PLLDIV = RCC_PLLDIV_3;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_RTC;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef sDate = {0};
+  RTC_AlarmTypeDef sAlarm = {0};
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 31;
+  hrtc.Init.SynchPrediv = 1023;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0;
+  sTime.Minutes = 0;
+  sTime.Seconds = 0;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+  sDate.Month = RTC_MONTH_JANUARY;
+  sDate.Date = 1;
+  sDate.Year = 0;
+
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Enable the Alarm A
+  */
+  sAlarm.AlarmTime.Hours = 0;
+  sAlarm.AlarmTime.Minutes = 0;
+  sAlarm.AlarmTime.Seconds = 0;
+  sAlarm.AlarmTime.SubSeconds = 0;
+  sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+  sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
+  sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+  sAlarm.AlarmDateWeekDay = 1;
+  sAlarm.Alarm = RTC_ALARM_A;
+  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 7;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, PA15_RESERVED_Pin|PA12_RESERVED_Pin|PA1_RESERVED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, PC1_RESERVED_Pin|PC0_RESERVED_Pin|PC2_RESERVED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PA15_RESERVED_Pin PA12_RESERVED_Pin PA1_RESERVED_Pin */
+  GPIO_InitStruct.Pin = PA15_RESERVED_Pin|PA12_RESERVED_Pin|PA1_RESERVED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB4_RESERVED_Pin PB1_RESERVED_Pin PB0_RESERVED_Pin */
+  GPIO_InitStruct.Pin = PB4_RESERVED_Pin|PB1_RESERVED_Pin|PB0_RESERVED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PC13_RESERVED_Pin */
+  GPIO_InitStruct.Pin = PC13_RESERVED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(PC13_RESERVED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PC1_RESERVED_Pin PC0_RESERVED_Pin PC2_RESERVED_Pin */
+  GPIO_InitStruct.Pin = PC1_RESERVED_Pin|PC0_RESERVED_Pin|PC2_RESERVED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+#ifdef USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

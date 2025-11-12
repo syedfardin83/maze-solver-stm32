@@ -1,11 +1,11 @@
 #include "main.h"
 
 //	General purpose variables:
-#define maze_x_len 3
-#define maze_y_len 3
-#define intersection_stack_max_len 15
-#define bfs_q_max_len 15
-#define path_len 15
+#define maze_x_len 16
+#define maze_y_len 16
+#define intersection_stack_max_len 100
+#define bfs_q_max_len 256
+#define path_len 256
 // destination coordinates...?
 
 
@@ -24,10 +24,10 @@ struct Cell{
 };
 
 void Cell(struct Cell* cell){
-	cell->wallLeft = 0;
-	cell->wallRight = 0;
-	cell->wallFront = 0;
-	cell->wallBack = 0;
+	cell->wallLeft = 2;
+	cell->wallRight = 2;
+	cell->wallFront = 2;
+	cell->wallBack = 2;
 	cell->visited = 0;
 
 	cell->bfs_visited = 0;
@@ -101,7 +101,7 @@ void Maze(struct Maze* maze,int8_t destx,int8_t desty){
     maze->dest[0] = destx;
     maze->dest[1] = desty;
 
-    maze->orient = 'N';
+    maze->orient = 'E';
 
     //cells constructor:
     for(int i=0;i<maze_x_len;i++){
@@ -171,6 +171,1293 @@ void Maze_SIM(struct Maze* maze){
 
 }
 
+void Maze_SIM_16x16(struct Maze* maze){
+	// 16x16 Maze Configuration
+	// Start: (0,0) - Destination: (15,15)
+	// Each cell has 4 walls: wallLeft, wallBack, wallRight, wallFront
+	// 1 = wall present, 0 = wall absent (opening)
+
+	maze->cells[0][0].wallLeft = 1;
+	maze->cells[0][0].wallBack = 1;
+	maze->cells[0][0].wallRight = 0;
+	maze->cells[0][0].wallFront = 1;
+
+	maze->cells[1][0].wallLeft = 0;
+	maze->cells[1][0].wallBack = 1;
+	maze->cells[1][0].wallRight = 0;
+	maze->cells[1][0].wallFront = 1;
+
+	maze->cells[2][0].wallLeft = 0;
+	maze->cells[2][0].wallBack = 1;
+	maze->cells[2][0].wallRight = 1;
+	maze->cells[2][0].wallFront = 0;
+
+	maze->cells[3][0].wallLeft = 1;
+	maze->cells[3][0].wallBack = 1;
+	maze->cells[3][0].wallRight = 0;
+	maze->cells[3][0].wallFront = 1;
+
+	maze->cells[4][0].wallLeft = 0;
+	maze->cells[4][0].wallBack = 1;
+	maze->cells[4][0].wallRight = 1;
+	maze->cells[4][0].wallFront = 0;
+
+	maze->cells[5][0].wallLeft = 1;
+	maze->cells[5][0].wallBack = 1;
+	maze->cells[5][0].wallRight = 0;
+	maze->cells[5][0].wallFront = 1;
+
+	maze->cells[6][0].wallLeft = 0;
+	maze->cells[6][0].wallBack = 1;
+	maze->cells[6][0].wallRight = 0;
+	maze->cells[6][0].wallFront = 1;
+
+	maze->cells[7][0].wallLeft = 0;
+	maze->cells[7][0].wallBack = 1;
+	maze->cells[7][0].wallRight = 1;
+	maze->cells[7][0].wallFront = 0;
+
+	maze->cells[8][0].wallLeft = 1;
+	maze->cells[8][0].wallBack = 1;
+	maze->cells[8][0].wallRight = 0;
+	maze->cells[8][0].wallFront = 1;
+
+	maze->cells[9][0].wallLeft = 0;
+	maze->cells[9][0].wallBack = 1;
+	maze->cells[9][0].wallRight = 1;
+	maze->cells[9][0].wallFront = 0;
+
+	maze->cells[10][0].wallLeft = 1;
+	maze->cells[10][0].wallBack = 1;
+	maze->cells[10][0].wallRight = 0;
+	maze->cells[10][0].wallFront = 1;
+
+	maze->cells[11][0].wallLeft = 0;
+	maze->cells[11][0].wallBack = 1;
+	maze->cells[11][0].wallRight = 0;
+	maze->cells[11][0].wallFront = 1;
+
+	maze->cells[12][0].wallLeft = 0;
+	maze->cells[12][0].wallBack = 1;
+	maze->cells[12][0].wallRight = 1;
+	maze->cells[12][0].wallFront = 0;
+
+	maze->cells[13][0].wallLeft = 1;
+	maze->cells[13][0].wallBack = 1;
+	maze->cells[13][0].wallRight = 0;
+	maze->cells[13][0].wallFront = 1;
+
+	maze->cells[14][0].wallLeft = 0;
+	maze->cells[14][0].wallBack = 1;
+	maze->cells[14][0].wallRight = 0;
+	maze->cells[14][0].wallFront = 1;
+
+	maze->cells[15][0].wallLeft = 0;
+	maze->cells[15][0].wallBack = 1;
+	maze->cells[15][0].wallRight = 1;
+	maze->cells[15][0].wallFront = 0;
+
+	maze->cells[0][1].wallLeft = 1;
+	maze->cells[0][1].wallBack = 1;
+	maze->cells[0][1].wallRight = 1;
+	maze->cells[0][1].wallFront = 0;
+
+	maze->cells[1][1].wallLeft = 1;
+	maze->cells[1][1].wallBack = 1;
+	maze->cells[1][1].wallRight = 1;
+	maze->cells[1][1].wallFront = 0;
+
+	maze->cells[2][1].wallLeft = 1;
+	maze->cells[2][1].wallBack = 0;
+	maze->cells[2][1].wallRight = 0;
+	maze->cells[2][1].wallFront = 1;
+
+	maze->cells[3][1].wallLeft = 0;
+	maze->cells[3][1].wallBack = 1;
+	maze->cells[3][1].wallRight = 1;
+	maze->cells[3][1].wallFront = 0;
+
+	maze->cells[4][1].wallLeft = 1;
+	maze->cells[4][1].wallBack = 0;
+	maze->cells[4][1].wallRight = 0;
+	maze->cells[4][1].wallFront = 1;
+
+	maze->cells[5][1].wallLeft = 0;
+	maze->cells[5][1].wallBack = 1;
+	maze->cells[5][1].wallRight = 1;
+	maze->cells[5][1].wallFront = 0;
+
+	maze->cells[6][1].wallLeft = 1;
+	maze->cells[6][1].wallBack = 1;
+	maze->cells[6][1].wallRight = 1;
+	maze->cells[6][1].wallFront = 0;
+
+	maze->cells[7][1].wallLeft = 1;
+	maze->cells[7][1].wallBack = 0;
+	maze->cells[7][1].wallRight = 0;
+	maze->cells[7][1].wallFront = 1;
+
+	maze->cells[8][1].wallLeft = 0;
+	maze->cells[8][1].wallBack = 1;
+	maze->cells[8][1].wallRight = 1;
+	maze->cells[8][1].wallFront = 0;
+
+	maze->cells[9][1].wallLeft = 1;
+	maze->cells[9][1].wallBack = 0;
+	maze->cells[9][1].wallRight = 0;
+	maze->cells[9][1].wallFront = 1;
+
+	maze->cells[10][1].wallLeft = 0;
+	maze->cells[10][1].wallBack = 1;
+	maze->cells[10][1].wallRight = 1;
+	maze->cells[10][1].wallFront = 0;
+
+	maze->cells[11][1].wallLeft = 1;
+	maze->cells[11][1].wallBack = 1;
+	maze->cells[11][1].wallRight = 1;
+	maze->cells[11][1].wallFront = 0;
+
+	maze->cells[12][1].wallLeft = 1;
+	maze->cells[12][1].wallBack = 0;
+	maze->cells[12][1].wallRight = 0;
+	maze->cells[12][1].wallFront = 1;
+
+	maze->cells[13][1].wallLeft = 0;
+	maze->cells[13][1].wallBack = 1;
+	maze->cells[13][1].wallRight = 1;
+	maze->cells[13][1].wallFront = 0;
+
+	maze->cells[14][1].wallLeft = 1;
+	maze->cells[14][1].wallBack = 1;
+	maze->cells[14][1].wallRight = 1;
+	maze->cells[14][1].wallFront = 0;
+
+	maze->cells[15][1].wallLeft = 1;
+	maze->cells[15][1].wallBack = 0;
+	maze->cells[15][1].wallRight = 1;
+	maze->cells[15][1].wallFront = 0;
+
+	maze->cells[0][2].wallLeft = 1;
+	maze->cells[0][2].wallBack = 0;
+	maze->cells[0][2].wallRight = 1;
+	maze->cells[0][2].wallFront = 0;
+
+	maze->cells[1][2].wallLeft = 1;
+	maze->cells[1][2].wallBack = 0;
+	maze->cells[1][2].wallRight = 1;
+	maze->cells[1][2].wallFront = 0;
+
+	maze->cells[2][2].wallLeft = 1;
+	maze->cells[2][2].wallBack = 1;
+	maze->cells[2][2].wallRight = 0;
+	maze->cells[2][2].wallFront = 0;
+
+	maze->cells[3][2].wallLeft = 0;
+	maze->cells[3][2].wallBack = 0;
+	maze->cells[3][2].wallRight = 1;
+	maze->cells[3][2].wallFront = 1;
+
+	maze->cells[4][2].wallLeft = 1;
+	maze->cells[4][2].wallBack = 1;
+	maze->cells[4][2].wallRight = 0;
+	maze->cells[4][2].wallFront = 0;
+
+	maze->cells[5][2].wallLeft = 0;
+	maze->cells[5][2].wallBack = 0;
+	maze->cells[5][2].wallRight = 1;
+	maze->cells[5][2].wallFront = 1;
+
+	maze->cells[6][2].wallLeft = 1;
+	maze->cells[6][2].wallBack = 0;
+	maze->cells[6][2].wallRight = 1;
+	maze->cells[6][2].wallFront = 0;
+
+	maze->cells[7][2].wallLeft = 1;
+	maze->cells[7][2].wallBack = 1;
+	maze->cells[7][2].wallRight = 0;
+	maze->cells[7][2].wallFront = 0;
+
+	maze->cells[8][2].wallLeft = 0;
+	maze->cells[8][2].wallBack = 0;
+	maze->cells[8][2].wallRight = 1;
+	maze->cells[8][2].wallFront = 1;
+
+	maze->cells[9][2].wallLeft = 1;
+	maze->cells[9][2].wallBack = 1;
+	maze->cells[9][2].wallRight = 0;
+	maze->cells[9][2].wallFront = 0;
+
+	maze->cells[10][2].wallLeft = 0;
+	maze->cells[10][2].wallBack = 0;
+	maze->cells[10][2].wallRight = 1;
+	maze->cells[10][2].wallFront = 1;
+
+	maze->cells[11][2].wallLeft = 1;
+	maze->cells[11][2].wallBack = 0;
+	maze->cells[11][2].wallRight = 1;
+	maze->cells[11][2].wallFront = 0;
+
+	maze->cells[12][2].wallLeft = 1;
+	maze->cells[12][2].wallBack = 1;
+	maze->cells[12][2].wallRight = 0;
+	maze->cells[12][2].wallFront = 0;
+
+	maze->cells[13][2].wallLeft = 0;
+	maze->cells[13][2].wallBack = 0;
+	maze->cells[13][2].wallRight = 1;
+	maze->cells[13][2].wallFront = 1;
+
+	maze->cells[14][2].wallLeft = 1;
+	maze->cells[14][2].wallBack = 0;
+	maze->cells[14][2].wallRight = 1;
+	maze->cells[14][2].wallFront = 0;
+
+	maze->cells[15][2].wallLeft = 1;
+	maze->cells[15][2].wallBack = 0;
+	maze->cells[15][2].wallRight = 1;
+	maze->cells[15][2].wallFront = 0;
+
+	maze->cells[0][3].wallLeft = 1;
+	maze->cells[0][3].wallBack = 0;
+	maze->cells[0][3].wallRight = 0;
+	maze->cells[0][3].wallFront = 1;
+
+	maze->cells[1][3].wallLeft = 0;
+	maze->cells[1][3].wallBack = 0;
+	maze->cells[1][3].wallRight = 1;
+	maze->cells[1][3].wallFront = 1;
+
+	maze->cells[2][3].wallLeft = 1;
+	maze->cells[2][3].wallBack = 0;
+	maze->cells[2][3].wallRight = 0;
+	maze->cells[2][3].wallFront = 1;
+
+	maze->cells[3][3].wallLeft = 0;
+	maze->cells[3][3].wallBack = 1;
+	maze->cells[3][3].wallRight = 1;
+	maze->cells[3][3].wallFront = 0;
+
+	maze->cells[4][3].wallLeft = 1;
+	maze->cells[4][3].wallBack = 0;
+	maze->cells[4][3].wallRight = 0;
+	maze->cells[4][3].wallFront = 1;
+
+	maze->cells[5][3].wallLeft = 0;
+	maze->cells[5][3].wallBack = 1;
+	maze->cells[5][3].wallRight = 1;
+	maze->cells[5][3].wallFront = 0;
+
+	maze->cells[6][3].wallLeft = 1;
+	maze->cells[6][3].wallBack = 0;
+	maze->cells[6][3].wallRight = 0;
+	maze->cells[6][3].wallFront = 1;
+
+	maze->cells[7][3].wallLeft = 0;
+	maze->cells[7][3].wallBack = 0;
+	maze->cells[7][3].wallRight = 1;
+	maze->cells[7][3].wallFront = 1;
+
+	maze->cells[8][3].wallLeft = 1;
+	maze->cells[8][3].wallBack = 1;
+	maze->cells[8][3].wallRight = 0;
+	maze->cells[8][3].wallFront = 0;
+
+	maze->cells[9][3].wallLeft = 0;
+	maze->cells[9][3].wallBack = 0;
+	maze->cells[9][3].wallRight = 1;
+	maze->cells[9][3].wallFront = 1;
+
+	maze->cells[10][3].wallLeft = 1;
+	maze->cells[10][3].wallBack = 1;
+	maze->cells[10][3].wallRight = 0;
+	maze->cells[10][3].wallFront = 0;
+
+	maze->cells[11][3].wallLeft = 0;
+	maze->cells[11][3].wallBack = 0;
+	maze->cells[11][3].wallRight = 1;
+	maze->cells[11][3].wallFront = 1;
+
+	maze->cells[12][3].wallLeft = 1;
+	maze->cells[12][3].wallBack = 0;
+	maze->cells[12][3].wallRight = 0;
+	maze->cells[12][3].wallFront = 1;
+
+	maze->cells[13][3].wallLeft = 0;
+	maze->cells[13][3].wallBack = 1;
+	maze->cells[13][3].wallRight = 1;
+	maze->cells[13][3].wallFront = 0;
+
+	maze->cells[14][3].wallLeft = 1;
+	maze->cells[14][3].wallBack = 0;
+	maze->cells[14][3].wallRight = 1;
+	maze->cells[14][3].wallFront = 0;
+
+	maze->cells[15][3].wallLeft = 1;
+	maze->cells[15][3].wallBack = 0;
+	maze->cells[15][3].wallRight = 1;
+	maze->cells[15][3].wallFront = 0;
+
+	maze->cells[0][4].wallLeft = 1;
+	maze->cells[0][4].wallBack = 1;
+	maze->cells[0][4].wallRight = 1;
+	maze->cells[0][4].wallFront = 0;
+
+	maze->cells[1][4].wallLeft = 1;
+	maze->cells[1][4].wallBack = 1;
+	maze->cells[1][4].wallRight = 0;
+	maze->cells[1][4].wallFront = 0;
+
+	maze->cells[2][4].wallLeft = 0;
+	maze->cells[2][4].wallBack = 1;
+	maze->cells[2][4].wallRight = 1;
+	maze->cells[2][4].wallFront = 0;
+
+	maze->cells[3][4].wallLeft = 1;
+	maze->cells[3][4].wallBack = 0;
+	maze->cells[3][4].wallRight = 0;
+	maze->cells[3][4].wallFront = 1;
+
+	maze->cells[4][4].wallLeft = 0;
+	maze->cells[4][4].wallBack = 1;
+	maze->cells[4][4].wallRight = 1;
+	maze->cells[4][4].wallFront = 0;
+
+	maze->cells[5][4].wallLeft = 1;
+	maze->cells[5][4].wallBack = 0;
+	maze->cells[5][4].wallRight = 0;
+	maze->cells[5][4].wallFront = 1;
+
+	maze->cells[6][4].wallLeft = 0;
+	maze->cells[6][4].wallBack = 1;
+	maze->cells[6][4].wallRight = 1;
+	maze->cells[6][4].wallFront = 0;
+
+	maze->cells[7][4].wallLeft = 1;
+	maze->cells[7][4].wallBack = 1;
+	maze->cells[7][4].wallRight = 0;
+	maze->cells[7][4].wallFront = 0;
+
+	maze->cells[8][4].wallLeft = 0;
+	maze->cells[8][4].wallBack = 0;
+	maze->cells[8][4].wallRight = 1;
+	maze->cells[8][4].wallFront = 1;
+
+	maze->cells[9][4].wallLeft = 1;
+	maze->cells[9][4].wallBack = 1;
+	maze->cells[9][4].wallRight = 0;
+	maze->cells[9][4].wallFront = 0;
+
+	maze->cells[10][4].wallLeft = 0;
+	maze->cells[10][4].wallBack = 0;
+	maze->cells[10][4].wallRight = 1;
+	maze->cells[10][4].wallFront = 1;
+
+	maze->cells[11][4].wallLeft = 1;
+	maze->cells[11][4].wallBack = 1;
+	maze->cells[11][4].wallRight = 0;
+	maze->cells[11][4].wallFront = 0;
+
+	maze->cells[12][4].wallLeft = 0;
+	maze->cells[12][4].wallBack = 1;
+	maze->cells[12][4].wallRight = 1;
+	maze->cells[12][4].wallFront = 0;
+
+	maze->cells[13][4].wallLeft = 1;
+	maze->cells[13][4].wallBack = 0;
+	maze->cells[13][4].wallRight = 0;
+	maze->cells[13][4].wallFront = 1;
+
+	maze->cells[14][4].wallLeft = 0;
+	maze->cells[14][4].wallBack = 0;
+	maze->cells[14][4].wallRight = 1;
+	maze->cells[14][4].wallFront = 1;
+
+	maze->cells[15][4].wallLeft = 1;
+	maze->cells[15][4].wallBack = 0;
+	maze->cells[15][4].wallRight = 1;
+	maze->cells[15][4].wallFront = 0;
+
+	maze->cells[0][5].wallLeft = 1;
+	maze->cells[0][5].wallBack = 0;
+	maze->cells[0][5].wallRight = 1;
+	maze->cells[0][5].wallFront = 0;
+
+	maze->cells[1][5].wallLeft = 1;
+	maze->cells[1][5].wallBack = 0;
+	maze->cells[1][5].wallRight = 0;
+	maze->cells[1][5].wallFront = 1;
+
+	maze->cells[2][5].wallLeft = 0;
+	maze->cells[2][5].wallBack = 0;
+	maze->cells[2][5].wallRight = 1;
+	maze->cells[2][5].wallFront = 1;
+
+	maze->cells[3][5].wallLeft = 1;
+	maze->cells[3][5].wallBack = 1;
+	maze->cells[3][5].wallRight = 0;
+	maze->cells[3][5].wallFront = 0;
+
+	maze->cells[4][5].wallLeft = 0;
+	maze->cells[4][5].wallBack = 0;
+	maze->cells[4][5].wallRight = 1;
+	maze->cells[4][5].wallFront = 1;
+
+	maze->cells[5][5].wallLeft = 1;
+	maze->cells[5][5].wallBack = 1;
+	maze->cells[5][5].wallRight = 0;
+	maze->cells[5][5].wallFront = 0;
+
+	maze->cells[6][5].wallLeft = 0;
+	maze->cells[6][5].wallBack = 0;
+	maze->cells[6][5].wallRight = 1;
+	maze->cells[6][5].wallFront = 1;
+
+	maze->cells[7][5].wallLeft = 1;
+	maze->cells[7][5].wallBack = 0;
+	maze->cells[7][5].wallRight = 0;
+	maze->cells[7][5].wallFront = 1;
+
+	maze->cells[8][5].wallLeft = 0;
+	maze->cells[8][5].wallBack = 1;
+	maze->cells[8][5].wallRight = 1;
+	maze->cells[8][5].wallFront = 0;
+
+	maze->cells[9][5].wallLeft = 1;
+	maze->cells[9][5].wallBack = 0;
+	maze->cells[9][5].wallRight = 0;
+	maze->cells[9][5].wallFront = 1;
+
+	maze->cells[10][5].wallLeft = 0;
+	maze->cells[10][5].wallBack = 1;
+	maze->cells[10][5].wallRight = 1;
+	maze->cells[10][5].wallFront = 0;
+
+	maze->cells[11][5].wallLeft = 1;
+	maze->cells[11][5].wallBack = 0;
+	maze->cells[11][5].wallRight = 0;
+	maze->cells[11][5].wallFront = 1;
+
+	maze->cells[12][5].wallLeft = 0;
+	maze->cells[12][5].wallBack = 0;
+	maze->cells[12][5].wallRight = 1;
+	maze->cells[12][5].wallFront = 1;
+
+	maze->cells[13][5].wallLeft = 1;
+	maze->cells[13][5].wallBack = 1;
+	maze->cells[13][5].wallRight = 0;
+	maze->cells[13][5].wallFront = 0;
+
+	maze->cells[14][5].wallLeft = 0;
+	maze->cells[14][5].wallBack = 1;
+	maze->cells[14][5].wallRight = 1;
+	maze->cells[14][5].wallFront = 0;
+
+	maze->cells[15][5].wallLeft = 1;
+	maze->cells[15][5].wallBack = 0;
+	maze->cells[15][5].wallRight = 1;
+	maze->cells[15][5].wallFront = 0;
+
+	maze->cells[0][6].wallLeft = 1;
+	maze->cells[0][6].wallBack = 0;
+	maze->cells[0][6].wallRight = 1;
+	maze->cells[0][6].wallFront = 0;
+
+	maze->cells[1][6].wallLeft = 1;
+	maze->cells[1][6].wallBack = 1;
+	maze->cells[1][6].wallRight = 1;
+	maze->cells[1][6].wallFront = 0;
+
+	maze->cells[2][6].wallLeft = 1;
+	maze->cells[2][6].wallBack = 1;
+	maze->cells[2][6].wallRight = 0;
+	maze->cells[2][6].wallFront = 0;
+
+	maze->cells[3][6].wallLeft = 0;
+	maze->cells[3][6].wallBack = 0;
+	maze->cells[3][6].wallRight = 1;
+	maze->cells[3][6].wallFront = 1;
+
+	maze->cells[4][6].wallLeft = 1;
+	maze->cells[4][6].wallBack = 1;
+	maze->cells[4][6].wallRight = 0;
+	maze->cells[4][6].wallFront = 0;
+
+	maze->cells[5][6].wallLeft = 0;
+	maze->cells[5][6].wallBack = 0;
+	maze->cells[5][6].wallRight = 1;
+	maze->cells[5][6].wallFront = 1;
+
+	maze->cells[6][6].wallLeft = 1;
+	maze->cells[6][6].wallBack = 1;
+	maze->cells[6][6].wallRight = 0;
+	maze->cells[6][6].wallFront = 0;
+
+	maze->cells[7][6].wallLeft = 0;
+	maze->cells[7][6].wallBack = 1;
+	maze->cells[7][6].wallRight = 1;
+	maze->cells[7][6].wallFront = 0;
+
+	maze->cells[8][6].wallLeft = 1;
+	maze->cells[8][6].wallBack = 0;
+	maze->cells[8][6].wallRight = 0;
+	maze->cells[8][6].wallFront = 1;
+
+	maze->cells[9][6].wallLeft = 0;
+	maze->cells[9][6].wallBack = 1;
+	maze->cells[9][6].wallRight = 1;
+	maze->cells[9][6].wallFront = 0;
+
+	maze->cells[10][6].wallLeft = 1;
+	maze->cells[10][6].wallBack = 0;
+	maze->cells[10][6].wallRight = 0;
+	maze->cells[10][6].wallFront = 1;
+
+	maze->cells[11][6].wallLeft = 0;
+	maze->cells[11][6].wallBack = 1;
+	maze->cells[11][6].wallRight = 1;
+	maze->cells[11][6].wallFront = 0;
+
+	maze->cells[12][6].wallLeft = 1;
+	maze->cells[12][6].wallBack = 1;
+	maze->cells[12][6].wallRight = 0;
+	maze->cells[12][6].wallFront = 0;
+
+	maze->cells[13][6].wallLeft = 0;
+	maze->cells[13][6].wallBack = 0;
+	maze->cells[13][6].wallRight = 1;
+	maze->cells[13][6].wallFront = 1;
+
+	maze->cells[14][6].wallLeft = 1;
+	maze->cells[14][6].wallBack = 0;
+	maze->cells[14][6].wallRight = 1;
+	maze->cells[14][6].wallFront = 0;
+
+	maze->cells[15][6].wallLeft = 1;
+	maze->cells[15][6].wallBack = 0;
+	maze->cells[15][6].wallRight = 1;
+	maze->cells[15][6].wallFront = 0;
+
+	maze->cells[0][7].wallLeft = 1;
+	maze->cells[0][7].wallBack = 0;
+	maze->cells[0][7].wallRight = 1;
+	maze->cells[0][7].wallFront = 0;
+
+	maze->cells[1][7].wallLeft = 1;
+	maze->cells[1][7].wallBack = 0;
+	maze->cells[1][7].wallRight = 1;
+	maze->cells[1][7].wallFront = 0;
+
+	maze->cells[2][7].wallLeft = 1;
+	maze->cells[2][7].wallBack = 0;
+	maze->cells[2][7].wallRight = 0;
+	maze->cells[2][7].wallFront = 1;
+
+	maze->cells[3][7].wallLeft = 0;
+	maze->cells[3][7].wallBack = 1;
+	maze->cells[3][7].wallRight = 1;
+	maze->cells[3][7].wallFront = 0;
+
+	maze->cells[4][7].wallLeft = 1;
+	maze->cells[4][7].wallBack = 0;
+	maze->cells[4][7].wallRight = 0;
+	maze->cells[4][7].wallFront = 1;
+
+	maze->cells[5][7].wallLeft = 0;
+	maze->cells[5][7].wallBack = 1;
+	maze->cells[5][7].wallRight = 1;
+	maze->cells[5][7].wallFront = 0;
+
+	maze->cells[6][7].wallLeft = 1;
+	maze->cells[6][7].wallBack = 0;
+	maze->cells[6][7].wallRight = 0;
+	maze->cells[6][7].wallFront = 1;
+
+	maze->cells[7][7].wallLeft = 0;
+	maze->cells[7][7].wallBack = 0;
+	maze->cells[7][7].wallRight = 1;
+	maze->cells[7][7].wallFront = 1;
+
+	maze->cells[8][7].wallLeft = 1;
+	maze->cells[8][7].wallBack = 1;
+	maze->cells[8][7].wallRight = 0;
+	maze->cells[8][7].wallFront = 0;
+
+	maze->cells[9][7].wallLeft = 0;
+	maze->cells[9][7].wallBack = 0;
+	maze->cells[9][7].wallRight = 1;
+	maze->cells[9][7].wallFront = 1;
+
+	maze->cells[10][7].wallLeft = 1;
+	maze->cells[10][7].wallBack = 1;
+	maze->cells[10][7].wallRight = 0;
+	maze->cells[10][7].wallFront = 0;
+
+	maze->cells[11][7].wallLeft = 0;
+	maze->cells[11][7].wallBack = 0;
+	maze->cells[11][7].wallRight = 1;
+	maze->cells[11][7].wallFront = 1;
+
+	maze->cells[12][7].wallLeft = 1;
+	maze->cells[12][7].wallBack = 0;
+	maze->cells[12][7].wallRight = 0;
+	maze->cells[12][7].wallFront = 1;
+
+	maze->cells[13][7].wallLeft = 0;
+	maze->cells[13][7].wallBack = 1;
+	maze->cells[13][7].wallRight = 1;
+	maze->cells[13][7].wallFront = 0;
+
+	maze->cells[14][7].wallLeft = 1;
+	maze->cells[14][7].wallBack = 0;
+	maze->cells[14][7].wallRight = 1;
+	maze->cells[14][7].wallFront = 0;
+
+	maze->cells[15][7].wallLeft = 1;
+	maze->cells[15][7].wallBack = 0;
+	maze->cells[15][7].wallRight = 1;
+	maze->cells[15][7].wallFront = 0;
+
+	maze->cells[0][8].wallLeft = 1;
+	maze->cells[0][8].wallBack = 0;
+	maze->cells[0][8].wallRight = 1;
+	maze->cells[0][8].wallFront = 0;
+
+	maze->cells[1][8].wallLeft = 1;
+	maze->cells[1][8].wallBack = 0;
+	maze->cells[1][8].wallRight = 0;
+	maze->cells[1][8].wallFront = 1;
+
+	maze->cells[2][8].wallLeft = 0;
+	maze->cells[2][8].wallBack = 1;
+	maze->cells[2][8].wallRight = 1;
+	maze->cells[2][8].wallFront = 0;
+
+	maze->cells[3][8].wallLeft = 1;
+	maze->cells[3][8].wallBack = 0;
+	maze->cells[3][8].wallRight = 0;
+	maze->cells[3][8].wallFront = 1;
+
+	maze->cells[4][8].wallLeft = 0;
+	maze->cells[4][8].wallBack = 1;
+	maze->cells[4][8].wallRight = 1;
+	maze->cells[4][8].wallFront = 0;
+
+	maze->cells[5][8].wallLeft = 1;
+	maze->cells[5][8].wallBack = 0;
+	maze->cells[5][8].wallRight = 0;
+	maze->cells[5][8].wallFront = 1;
+
+	maze->cells[6][8].wallLeft = 0;
+	maze->cells[6][8].wallBack = 1;
+	maze->cells[6][8].wallRight = 1;
+	maze->cells[6][8].wallFront = 0;
+
+	maze->cells[7][8].wallLeft = 1;
+	maze->cells[7][8].wallBack = 1;
+	maze->cells[7][8].wallRight = 0;
+	maze->cells[7][8].wallFront = 0;
+
+	maze->cells[8][8].wallLeft = 0;
+	maze->cells[8][8].wallBack = 0;
+	maze->cells[8][8].wallRight = 1;
+	maze->cells[8][8].wallFront = 1;
+
+	maze->cells[9][8].wallLeft = 1;
+	maze->cells[9][8].wallBack = 1;
+	maze->cells[9][8].wallRight = 0;
+	maze->cells[9][8].wallFront = 0;
+
+	maze->cells[10][8].wallLeft = 0;
+	maze->cells[10][8].wallBack = 0;
+	maze->cells[10][8].wallRight = 1;
+	maze->cells[10][8].wallFront = 1;
+
+	maze->cells[11][8].wallLeft = 1;
+	maze->cells[11][8].wallBack = 1;
+	maze->cells[11][8].wallRight = 0;
+	maze->cells[11][8].wallFront = 0;
+
+	maze->cells[12][8].wallLeft = 0;
+	maze->cells[12][8].wallBack = 1;
+	maze->cells[12][8].wallRight = 1;
+	maze->cells[12][8].wallFront = 0;
+
+	maze->cells[13][8].wallLeft = 1;
+	maze->cells[13][8].wallBack = 0;
+	maze->cells[13][8].wallRight = 0;
+	maze->cells[13][8].wallFront = 1;
+
+	maze->cells[14][8].wallLeft = 0;
+	maze->cells[14][8].wallBack = 0;
+	maze->cells[14][8].wallRight = 1;
+	maze->cells[14][8].wallFront = 1;
+
+	maze->cells[15][8].wallLeft = 1;
+	maze->cells[15][8].wallBack = 0;
+	maze->cells[15][8].wallRight = 1;
+	maze->cells[15][8].wallFront = 0;
+
+	maze->cells[0][9].wallLeft = 1;
+	maze->cells[0][9].wallBack = 0;
+	maze->cells[0][9].wallRight = 0;
+	maze->cells[0][9].wallFront = 1;
+
+	maze->cells[1][9].wallLeft = 0;
+	maze->cells[1][9].wallBack = 1;
+	maze->cells[1][9].wallRight = 1;
+	maze->cells[1][9].wallFront = 0;
+
+	maze->cells[2][9].wallLeft = 1;
+	maze->cells[2][9].wallBack = 0;
+	maze->cells[2][9].wallRight = 0;
+	maze->cells[2][9].wallFront = 1;
+
+	maze->cells[3][9].wallLeft = 0;
+	maze->cells[3][9].wallBack = 1;
+	maze->cells[3][9].wallRight = 1;
+	maze->cells[3][9].wallFront = 0;
+
+	maze->cells[4][9].wallLeft = 1;
+	maze->cells[4][9].wallBack = 0;
+	maze->cells[4][9].wallRight = 0;
+	maze->cells[4][9].wallFront = 1;
+
+	maze->cells[5][9].wallLeft = 0;
+	maze->cells[5][9].wallBack = 1;
+	maze->cells[5][9].wallRight = 1;
+	maze->cells[5][9].wallFront = 0;
+
+	maze->cells[6][9].wallLeft = 1;
+	maze->cells[6][9].wallBack = 0;
+	maze->cells[6][9].wallRight = 0;
+	maze->cells[6][9].wallFront = 1;
+
+	maze->cells[7][9].wallLeft = 0;
+	maze->cells[7][9].wallBack = 0;
+	maze->cells[7][9].wallRight = 1;
+	maze->cells[7][9].wallFront = 1;
+
+	maze->cells[8][9].wallLeft = 1;
+	maze->cells[8][9].wallBack = 1;
+	maze->cells[8][9].wallRight = 0;
+	maze->cells[8][9].wallFront = 0;
+
+	maze->cells[9][9].wallLeft = 0;
+	maze->cells[9][9].wallBack = 0;
+	maze->cells[9][9].wallRight = 1;
+	maze->cells[9][9].wallFront = 1;
+
+	maze->cells[10][9].wallLeft = 1;
+	maze->cells[10][9].wallBack = 1;
+	maze->cells[10][9].wallRight = 0;
+	maze->cells[10][9].wallFront = 0;
+
+	maze->cells[11][9].wallLeft = 0;
+	maze->cells[11][9].wallBack = 0;
+	maze->cells[11][9].wallRight = 1;
+	maze->cells[11][9].wallFront = 1;
+
+	maze->cells[12][9].wallLeft = 1;
+	maze->cells[12][9].wallBack = 0;
+	maze->cells[12][9].wallRight = 0;
+	maze->cells[12][9].wallFront = 1;
+
+	maze->cells[13][9].wallLeft = 0;
+	maze->cells[13][9].wallBack = 1;
+	maze->cells[13][9].wallRight = 1;
+	maze->cells[13][9].wallFront = 0;
+
+	maze->cells[14][9].wallLeft = 1;
+	maze->cells[14][9].wallBack = 1;
+	maze->cells[14][9].wallRight = 0;
+	maze->cells[14][9].wallFront = 0;
+
+	maze->cells[15][9].wallLeft = 0;
+	maze->cells[15][9].wallBack = 0;
+	maze->cells[15][9].wallRight = 1;
+	maze->cells[15][9].wallFront = 1;
+
+	maze->cells[0][10].wallLeft = 1;
+	maze->cells[0][10].wallBack = 1;
+	maze->cells[0][10].wallRight = 1;
+	maze->cells[0][10].wallFront = 0;
+
+	maze->cells[1][10].wallLeft = 1;
+	maze->cells[1][10].wallBack = 0;
+	maze->cells[1][10].wallRight = 0;
+	maze->cells[1][10].wallFront = 1;
+
+	maze->cells[2][10].wallLeft = 0;
+	maze->cells[2][10].wallBack = 1;
+	maze->cells[2][10].wallRight = 1;
+	maze->cells[2][10].wallFront = 0;
+
+	maze->cells[3][10].wallLeft = 1;
+	maze->cells[3][10].wallBack = 0;
+	maze->cells[3][10].wallRight = 0;
+	maze->cells[3][10].wallFront = 1;
+
+	maze->cells[4][10].wallLeft = 0;
+	maze->cells[4][10].wallBack = 1;
+	maze->cells[4][10].wallRight = 1;
+	maze->cells[4][10].wallFront = 0;
+
+	maze->cells[5][10].wallLeft = 1;
+	maze->cells[5][10].wallBack = 0;
+	maze->cells[5][10].wallRight = 0;
+	maze->cells[5][10].wallFront = 1;
+
+	maze->cells[6][10].wallLeft = 0;
+	maze->cells[6][10].wallBack = 1;
+	maze->cells[6][10].wallRight = 1;
+	maze->cells[6][10].wallFront = 0;
+
+	maze->cells[7][10].wallLeft = 1;
+	maze->cells[7][10].wallBack = 1;
+	maze->cells[7][10].wallRight = 0;
+	maze->cells[7][10].wallFront = 0;
+
+	maze->cells[8][10].wallLeft = 0;
+	maze->cells[8][10].wallBack = 0;
+	maze->cells[8][10].wallRight = 1;
+	maze->cells[8][10].wallFront = 1;
+
+	maze->cells[9][10].wallLeft = 1;
+	maze->cells[9][10].wallBack = 1;
+	maze->cells[9][10].wallRight = 0;
+	maze->cells[9][10].wallFront = 0;
+
+	maze->cells[10][10].wallLeft = 0;
+	maze->cells[10][10].wallBack = 0;
+	maze->cells[10][10].wallRight = 1;
+	maze->cells[10][10].wallFront = 1;
+
+	maze->cells[11][10].wallLeft = 1;
+	maze->cells[11][10].wallBack = 1;
+	maze->cells[11][10].wallRight = 0;
+	maze->cells[11][10].wallFront = 0;
+
+	maze->cells[12][10].wallLeft = 0;
+	maze->cells[12][10].wallBack = 1;
+	maze->cells[12][10].wallRight = 1;
+	maze->cells[12][10].wallFront = 0;
+
+	maze->cells[13][10].wallLeft = 1;
+	maze->cells[13][10].wallBack = 0;
+	maze->cells[13][10].wallRight = 0;
+	maze->cells[13][10].wallFront = 1;
+
+	maze->cells[14][10].wallLeft = 0;
+	maze->cells[14][10].wallBack = 0;
+	maze->cells[14][10].wallRight = 1;
+	maze->cells[14][10].wallFront = 1;
+
+	maze->cells[15][10].wallLeft = 1;
+	maze->cells[15][10].wallBack = 1;
+	maze->cells[15][10].wallRight = 1;
+	maze->cells[15][10].wallFront = 0;
+
+	maze->cells[0][11].wallLeft = 1;
+	maze->cells[0][11].wallBack = 0;
+	maze->cells[0][11].wallRight = 1;
+	maze->cells[0][11].wallFront = 0;
+
+	maze->cells[1][11].wallLeft = 1;
+	maze->cells[1][11].wallBack = 1;
+	maze->cells[1][11].wallRight = 1;
+	maze->cells[1][11].wallFront = 0;
+
+	maze->cells[2][11].wallLeft = 1;
+	maze->cells[2][11].wallBack = 0;
+	maze->cells[2][11].wallRight = 0;
+	maze->cells[2][11].wallFront = 1;
+
+	maze->cells[3][11].wallLeft = 0;
+	maze->cells[3][11].wallBack = 1;
+	maze->cells[3][11].wallRight = 1;
+	maze->cells[3][11].wallFront = 0;
+
+	maze->cells[4][11].wallLeft = 1;
+	maze->cells[4][11].wallBack = 0;
+	maze->cells[4][11].wallRight = 0;
+	maze->cells[4][11].wallFront = 1;
+
+	maze->cells[5][11].wallLeft = 0;
+	maze->cells[5][11].wallBack = 1;
+	maze->cells[5][11].wallRight = 1;
+	maze->cells[5][11].wallFront = 0;
+
+	maze->cells[6][11].wallLeft = 1;
+	maze->cells[6][11].wallBack = 0;
+	maze->cells[6][11].wallRight = 0;
+	maze->cells[6][11].wallFront = 1;
+
+	maze->cells[7][11].wallLeft = 0;
+	maze->cells[7][11].wallBack = 0;
+	maze->cells[7][11].wallRight = 1;
+	maze->cells[7][11].wallFront = 1;
+
+	maze->cells[8][11].wallLeft = 1;
+	maze->cells[8][11].wallBack = 1;
+	maze->cells[8][11].wallRight = 0;
+	maze->cells[8][11].wallFront = 0;
+
+	maze->cells[9][11].wallLeft = 0;
+	maze->cells[9][11].wallBack = 0;
+	maze->cells[9][11].wallRight = 1;
+	maze->cells[9][11].wallFront = 1;
+
+	maze->cells[10][11].wallLeft = 1;
+	maze->cells[10][11].wallBack = 1;
+	maze->cells[10][11].wallRight = 0;
+	maze->cells[10][11].wallFront = 0;
+
+	maze->cells[11][11].wallLeft = 0;
+	maze->cells[11][11].wallBack = 0;
+	maze->cells[11][11].wallRight = 1;
+	maze->cells[11][11].wallFront = 1;
+
+	maze->cells[12][11].wallLeft = 1;
+	maze->cells[12][11].wallBack = 0;
+	maze->cells[12][11].wallRight = 0;
+	maze->cells[12][11].wallFront = 1;
+
+	maze->cells[13][11].wallLeft = 0;
+	maze->cells[13][11].wallBack = 1;
+	maze->cells[13][11].wallRight = 1;
+	maze->cells[13][11].wallFront = 0;
+
+	maze->cells[14][11].wallLeft = 1;
+	maze->cells[14][11].wallBack = 1;
+	maze->cells[14][11].wallRight = 1;
+	maze->cells[14][11].wallFront = 0;
+
+	maze->cells[15][11].wallLeft = 1;
+	maze->cells[15][11].wallBack = 0;
+	maze->cells[15][11].wallRight = 1;
+	maze->cells[15][11].wallFront = 0;
+
+	maze->cells[0][12].wallLeft = 1;
+	maze->cells[0][12].wallBack = 0;
+	maze->cells[0][12].wallRight = 1;
+	maze->cells[0][12].wallFront = 0;
+
+	maze->cells[1][12].wallLeft = 1;
+	maze->cells[1][12].wallBack = 0;
+	maze->cells[1][12].wallRight = 0;
+	maze->cells[1][12].wallFront = 1;
+
+	maze->cells[2][12].wallLeft = 0;
+	maze->cells[2][12].wallBack = 1;
+	maze->cells[2][12].wallRight = 1;
+	maze->cells[2][12].wallFront = 0;
+
+	maze->cells[3][12].wallLeft = 1;
+	maze->cells[3][12].wallBack = 0;
+	maze->cells[3][12].wallRight = 0;
+	maze->cells[3][12].wallFront = 1;
+
+	maze->cells[4][12].wallLeft = 0;
+	maze->cells[4][12].wallBack = 1;
+	maze->cells[4][12].wallRight = 1;
+	maze->cells[4][12].wallFront = 0;
+
+	maze->cells[5][12].wallLeft = 1;
+	maze->cells[5][12].wallBack = 0;
+	maze->cells[5][12].wallRight = 0;
+	maze->cells[5][12].wallFront = 1;
+
+	maze->cells[6][12].wallLeft = 0;
+	maze->cells[6][12].wallBack = 1;
+	maze->cells[6][12].wallRight = 1;
+	maze->cells[6][12].wallFront = 0;
+
+	maze->cells[7][12].wallLeft = 1;
+	maze->cells[7][12].wallBack = 1;
+	maze->cells[7][12].wallRight = 0;
+	maze->cells[7][12].wallFront = 0;
+
+	maze->cells[8][12].wallLeft = 0;
+	maze->cells[8][12].wallBack = 0;
+	maze->cells[8][12].wallRight = 1;
+	maze->cells[8][12].wallFront = 1;
+
+	maze->cells[9][12].wallLeft = 1;
+	maze->cells[9][12].wallBack = 1;
+	maze->cells[9][12].wallRight = 0;
+	maze->cells[9][12].wallFront = 0;
+
+	maze->cells[10][12].wallLeft = 0;
+	maze->cells[10][12].wallBack = 0;
+	maze->cells[10][12].wallRight = 1;
+	maze->cells[10][12].wallFront = 1;
+
+	maze->cells[11][12].wallLeft = 1;
+	maze->cells[11][12].wallBack = 1;
+	maze->cells[11][12].wallRight = 0;
+	maze->cells[11][12].wallFront = 0;
+
+	maze->cells[12][12].wallLeft = 0;
+	maze->cells[12][12].wallBack = 1;
+	maze->cells[12][12].wallRight = 1;
+	maze->cells[12][12].wallFront = 0;
+
+	maze->cells[13][12].wallLeft = 1;
+	maze->cells[13][12].wallBack = 0;
+	maze->cells[13][12].wallRight = 1;
+	maze->cells[13][12].wallFront = 0;
+
+	maze->cells[14][12].wallLeft = 1;
+	maze->cells[14][12].wallBack = 0;
+	maze->cells[14][12].wallRight = 1;
+	maze->cells[14][12].wallFront = 0;
+
+	maze->cells[15][12].wallLeft = 1;
+	maze->cells[15][12].wallBack = 0;
+	maze->cells[15][12].wallRight = 1;
+	maze->cells[15][12].wallFront = 0;
+
+	maze->cells[0][13].wallLeft = 1;
+	maze->cells[0][13].wallBack = 0;
+	maze->cells[0][13].wallRight = 1;
+	maze->cells[0][13].wallFront = 0;
+
+	maze->cells[1][13].wallLeft = 1;
+	maze->cells[1][13].wallBack = 1;
+	maze->cells[1][13].wallRight = 1;
+	maze->cells[1][13].wallFront = 0;
+
+	maze->cells[2][13].wallLeft = 1;
+	maze->cells[2][13].wallBack = 0;
+	maze->cells[2][13].wallRight = 0;
+	maze->cells[2][13].wallFront = 1;
+
+	maze->cells[3][13].wallLeft = 0;
+	maze->cells[3][13].wallBack = 1;
+	maze->cells[3][13].wallRight = 1;
+	maze->cells[3][13].wallFront = 0;
+
+	maze->cells[4][13].wallLeft = 1;
+	maze->cells[4][13].wallBack = 0;
+	maze->cells[4][13].wallRight = 0;
+	maze->cells[4][13].wallFront = 1;
+
+	maze->cells[5][13].wallLeft = 0;
+	maze->cells[5][13].wallBack = 1;
+	maze->cells[5][13].wallRight = 1;
+	maze->cells[5][13].wallFront = 0;
+
+	maze->cells[6][13].wallLeft = 1;
+	maze->cells[6][13].wallBack = 0;
+	maze->cells[6][13].wallRight = 0;
+	maze->cells[6][13].wallFront = 1;
+
+	maze->cells[7][13].wallLeft = 0;
+	maze->cells[7][13].wallBack = 0;
+	maze->cells[7][13].wallRight = 1;
+	maze->cells[7][13].wallFront = 1;
+
+	maze->cells[8][13].wallLeft = 1;
+	maze->cells[8][13].wallBack = 1;
+	maze->cells[8][13].wallRight = 0;
+	maze->cells[8][13].wallFront = 0;
+
+	maze->cells[9][13].wallLeft = 0;
+	maze->cells[9][13].wallBack = 0;
+	maze->cells[9][13].wallRight = 1;
+	maze->cells[9][13].wallFront = 1;
+
+	maze->cells[10][13].wallLeft = 1;
+	maze->cells[10][13].wallBack = 1;
+	maze->cells[10][13].wallRight = 0;
+	maze->cells[10][13].wallFront = 0;
+
+	maze->cells[11][13].wallLeft = 0;
+	maze->cells[11][13].wallBack = 0;
+	maze->cells[11][13].wallRight = 1;
+	maze->cells[11][13].wallFront = 1;
+
+	maze->cells[12][13].wallLeft = 1;
+	maze->cells[12][13].wallBack = 0;
+	maze->cells[12][13].wallRight = 1;
+	maze->cells[12][13].wallFront = 0;
+
+	maze->cells[13][13].wallLeft = 1;
+	maze->cells[13][13].wallBack = 0;
+	maze->cells[13][13].wallRight = 1;
+	maze->cells[13][13].wallFront = 0;
+
+	maze->cells[14][13].wallLeft = 1;
+	maze->cells[14][13].wallBack = 0;
+	maze->cells[14][13].wallRight = 1;
+	maze->cells[14][13].wallFront = 0;
+
+	maze->cells[15][13].wallLeft = 1;
+	maze->cells[15][13].wallBack = 0;
+	maze->cells[15][13].wallRight = 1;
+	maze->cells[15][13].wallFront = 0;
+
+	maze->cells[0][14].wallLeft = 1;
+	maze->cells[0][14].wallBack = 0;
+	maze->cells[0][14].wallRight = 1;
+	maze->cells[0][14].wallFront = 0;
+
+	maze->cells[1][14].wallLeft = 1;
+	maze->cells[1][14].wallBack = 0;
+	maze->cells[1][14].wallRight = 1;
+	maze->cells[1][14].wallFront = 0;
+
+	maze->cells[2][14].wallLeft = 1;
+	maze->cells[2][14].wallBack = 1;
+	maze->cells[2][14].wallRight = 1;
+	maze->cells[2][14].wallFront = 0;
+
+	maze->cells[3][14].wallLeft = 1;
+	maze->cells[3][14].wallBack = 0;
+	maze->cells[3][14].wallRight = 0;
+	maze->cells[3][14].wallFront = 1;
+
+	maze->cells[4][14].wallLeft = 0;
+	maze->cells[4][14].wallBack = 1;
+	maze->cells[4][14].wallRight = 1;
+	maze->cells[4][14].wallFront = 0;
+
+	maze->cells[5][14].wallLeft = 1;
+	maze->cells[5][14].wallBack = 0;
+	maze->cells[5][14].wallRight = 0;
+	maze->cells[5][14].wallFront = 1;
+
+	maze->cells[6][14].wallLeft = 0;
+	maze->cells[6][14].wallBack = 1;
+	maze->cells[6][14].wallRight = 1;
+	maze->cells[6][14].wallFront = 0;
+
+	maze->cells[7][14].wallLeft = 1;
+	maze->cells[7][14].wallBack = 1;
+	maze->cells[7][14].wallRight = 0;
+	maze->cells[7][14].wallFront = 0;
+
+	maze->cells[8][14].wallLeft = 0;
+	maze->cells[8][14].wallBack = 0;
+	maze->cells[8][14].wallRight = 1;
+	maze->cells[8][14].wallFront = 1;
+
+	maze->cells[9][14].wallLeft = 1;
+	maze->cells[9][14].wallBack = 1;
+	maze->cells[9][14].wallRight = 0;
+	maze->cells[9][14].wallFront = 0;
+
+	maze->cells[10][14].wallLeft = 0;
+	maze->cells[10][14].wallBack = 0;
+	maze->cells[10][14].wallRight = 1;
+	maze->cells[10][14].wallFront = 1;
+
+	maze->cells[11][14].wallLeft = 1;
+	maze->cells[11][14].wallBack = 1;
+	maze->cells[11][14].wallRight = 0;
+	maze->cells[11][14].wallFront = 0;
+
+	maze->cells[12][14].wallLeft = 0;
+	maze->cells[12][14].wallBack = 0;
+	maze->cells[12][14].wallRight = 1;
+	maze->cells[12][14].wallFront = 1;
+
+	maze->cells[13][14].wallLeft = 1;
+	maze->cells[13][14].wallBack = 0;
+	maze->cells[13][14].wallRight = 1;
+	maze->cells[13][14].wallFront = 0;
+
+	maze->cells[14][14].wallLeft = 1;
+	maze->cells[14][14].wallBack = 0;
+	maze->cells[14][14].wallRight = 0;
+	maze->cells[14][14].wallFront = 1;
+
+	maze->cells[15][14].wallLeft = 0;
+	maze->cells[15][14].wallBack = 0;
+	maze->cells[15][14].wallRight = 1;
+	maze->cells[15][14].wallFront = 1;
+
+	maze->cells[0][15].wallLeft = 1;
+	maze->cells[0][15].wallBack = 0;
+	maze->cells[0][15].wallRight = 1;
+	maze->cells[0][15].wallFront = 1;
+
+	maze->cells[1][15].wallLeft = 1;
+	maze->cells[1][15].wallBack = 0;
+	maze->cells[1][15].wallRight = 1;
+	maze->cells[1][15].wallFront = 1;
+
+	maze->cells[2][15].wallLeft = 1;
+	maze->cells[2][15].wallBack = 0;
+	maze->cells[2][15].wallRight = 1;
+	maze->cells[2][15].wallFront = 1;
+
+	maze->cells[3][15].wallLeft = 1;
+	maze->cells[3][15].wallBack = 1;
+	maze->cells[3][15].wallRight = 1;
+	maze->cells[3][15].wallFront = 1;
+
+	maze->cells[4][15].wallLeft = 1;
+	maze->cells[4][15].wallBack = 0;
+	maze->cells[4][15].wallRight = 1;
+	maze->cells[4][15].wallFront = 1;
+
+	maze->cells[5][15].wallLeft = 1;
+	maze->cells[5][15].wallBack = 1;
+	maze->cells[5][15].wallRight = 1;
+	maze->cells[5][15].wallFront = 1;
+
+	maze->cells[6][15].wallLeft = 1;
+	maze->cells[6][15].wallBack = 0;
+	maze->cells[6][15].wallRight = 1;
+	maze->cells[6][15].wallFront = 1;
+
+	maze->cells[7][15].wallLeft = 1;
+	maze->cells[7][15].wallBack = 0;
+	maze->cells[7][15].wallRight = 1;
+	maze->cells[7][15].wallFront = 1;
+
+	maze->cells[8][15].wallLeft = 1;
+	maze->cells[8][15].wallBack = 1;
+	maze->cells[8][15].wallRight = 1;
+	maze->cells[8][15].wallFront = 1;
+
+	maze->cells[9][15].wallLeft = 1;
+	maze->cells[9][15].wallBack = 0;
+	maze->cells[9][15].wallRight = 1;
+	maze->cells[9][15].wallFront = 1;
+
+	maze->cells[10][15].wallLeft = 1;
+	maze->cells[10][15].wallBack = 1;
+	maze->cells[10][15].wallRight = 1;
+	maze->cells[10][15].wallFront = 1;
+
+	maze->cells[11][15].wallLeft = 1;
+	maze->cells[11][15].wallBack = 0;
+	maze->cells[11][15].wallRight = 1;
+	maze->cells[11][15].wallFront = 1;
+
+	maze->cells[12][15].wallLeft = 1;
+	maze->cells[12][15].wallBack = 1;
+	maze->cells[12][15].wallRight = 1;
+	maze->cells[12][15].wallFront = 1;
+
+	maze->cells[13][15].wallLeft = 1;
+	maze->cells[13][15].wallBack = 0;
+	maze->cells[13][15].wallRight = 1;
+	maze->cells[13][15].wallFront = 1;
+
+	maze->cells[14][15].wallLeft = 1;
+	maze->cells[14][15].wallBack = 1;
+	maze->cells[14][15].wallRight = 0;
+	maze->cells[14][15].wallFront = 1;
+
+	maze->cells[15][15].wallLeft = 0;
+	maze->cells[15][15].wallBack = 1;
+	maze->cells[15][15].wallRight = 1;
+	maze->cells[15][15].wallFront = 1;
+
+}
 
 void SIM_move_forward(struct Maze* maze){
 	if(maze->orient=='N') maze->curr_cell[1]++;
@@ -235,12 +1522,18 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
         }
+        else if(SIM_wall_left(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             // symmetric update: neighbor to the east has left wall
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }
+        else if(SIM_wall_right(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
         }
         if (SIM_wall_front(sim_maze)==1)
         {
@@ -249,12 +1542,18 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
         }
+        else if(SIM_wall_front(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             // symmetric update: neighbor to the south has front wall
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }
+        else if(SIM_wall_back(sim_maze)==0){
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
         }
     }
     else if (maze->orient == 'E')
@@ -265,23 +1564,36 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+        }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
     }
     else if (maze->orient == 'S')
@@ -292,23 +1604,34 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             if (maze->curr_cell[0] < maze_x_len-1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
         }
+        else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+        }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
             if (maze->curr_cell[1] < maze_y_len-1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
         }
     }
     else if (maze->orient == 'W')
@@ -318,24 +1641,36 @@ void update_walls(struct Maze* maze,struct Maze* sim_maze){
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 1;
             if (maze->curr_cell[1] > 0)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] - 1].wallFront = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallBack = 0;
+
         }
         if (SIM_wall_right(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 1;
             if (maze->curr_cell[1] < maze_y_len - 1)
                 maze->cells[maze->curr_cell[0]][maze->curr_cell[1] + 1].wallBack = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallFront = 0;
+
         }
         if (SIM_wall_front(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 1;
             if (maze->curr_cell[0] > 0)
                 maze->cells[maze->curr_cell[0] - 1][maze->curr_cell[1]].wallRight = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallLeft = 0;
+
         }
         if (SIM_wall_back(sim_maze)==1)
         {
             maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 1;
             if (maze->curr_cell[0] < maze_x_len - 1)
                 maze->cells[maze->curr_cell[0] + 1][maze->curr_cell[1]].wallLeft = 1;
+        }else{
+            maze->cells[maze->curr_cell[0]][maze->curr_cell[1]].wallRight = 0;
+
         }
     }
     else
@@ -1089,6 +2424,8 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
+int a = 1;
+
 int main(void)
 {
 
@@ -1109,20 +2446,22 @@ int main(void)
   SystemClock_Config();
 
   struct Maze sim_maze;
-  Maze(&sim_maze,0,2);
+  Maze(&sim_maze,15,15);
 //  Maze_SIM(&sim_maze);
-  Maze_SIM(&sim_maze);
+  Maze_SIM_16x16(&sim_maze);
 
   struct Maze maze;
-  Maze(&maze,0,2);
+  Maze(&maze,15,15);
 
-  int a = 1;
+  a++;
   DFS_explore(&maze,&sim_maze);
   a++;
-  a++;
   flood_fill(&maze,&sim_maze);
+  a++;
   while (1)
   {
+	  a++;
+	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
