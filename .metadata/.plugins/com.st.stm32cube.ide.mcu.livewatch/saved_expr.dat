@@ -1,2 +1,4 @@
-maze
-maze.cells[0][0].wallLeft
+a
+total_time
+dfs_time
+ff_time
