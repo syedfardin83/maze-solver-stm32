@@ -1,0 +1,29 @@
+19:42:23 **** Incremental Build of configuration Debug for project timers ****
+make -j18 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m0plus -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L072xx -c -I../Core/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc -I../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L0xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:114:3: warning: implicit declaration of function 'printf' [-Wimplicit-function-declaration]
+  114 |   printf("Starting...\n");
+      |   ^~~~~~
+../Core/Src/main.c:21:1: note: include '<stdio.h>' or provide a declaration of 'printf'
+   20 | #include "main.h"
+  +++ |+#include <stdio.h>
+   21 | 
+../Core/Src/main.c:114:3: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+  114 |   printf("Starting...\n");
+      |   ^~~~~~
+../Core/Src/main.c:114:3: note: include '<stdio.h>' or provide a declaration of 'printf'
+arm-none-eabi-gcc -o "timers.elf" @"objects.list"   -mcpu=cortex-m0plus -T"C:\Users\Syed Fardin\Desktop\Coding\maze-solver-stm32\timers\STM32L072CZYX_FLASH.ld" --specs=nosys.specs -Wl,-Map="timers.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: timers.elf
+ 
+arm-none-eabi-size  timers.elf 
+arm-none-eabi-objdump -h -S timers.elf  > "timers.list"
+   text	   data	    bss	    dec	    hex	filename
+  20376	    104	   2168	  22648	   5878	timers.elf
+Finished building: default.size.stdout
+ 
+Finished building: timers.list
+ 
+
+19:42:24 Build Finished. 0 errors, 2 warnings. (took 732ms)
+

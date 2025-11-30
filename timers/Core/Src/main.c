@@ -63,6 +63,19 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int _write(int file,char *ptr,int len){
+	HAL_StatusTypeDef hstatus;
+
+	if(file==1 || file==2){
+		hstatus = HAL_UART_Transmit(&huart2,(uint8_t *)ptr,len,HAL_MAX_DELAY);
+		if(hstatus==HAL_OK) return len;
+		else return -1;
+	}
+	else return -1;
+
+}
+int a=0;
+
 /* USER CODE END 0 */
 
 /**
@@ -98,7 +111,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("Starting...\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,7 +119,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	printf("Value of a is %d \n",a);
+	a++;
+	HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
