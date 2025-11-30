@@ -2453,8 +2453,8 @@ int main(void)
   flood_fill(&maze,&sim_maze);
   ff_end_time = HAL_GetTick();
 
-  dfs_time = dfs_end_time = dfs_start_time;
-  ff_time = ff_end_time = ff_start_time;
+  dfs_time = dfs_end_time -dfs_start_time;
+  ff_time = ff_end_time - ff_start_time;
 
   total_time = dfs_time+ff_time;
 

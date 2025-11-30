@@ -2522,14 +2522,14 @@ int main(void)
   HAL_TIM_Base_Start(&htim7);
   dfs_start_time = __HAL_TIM_GET_COUNTER(&htim7);
   DFS_explore(&maze,&sim_maze);
-  dfs_end_time = HAL_GetTick();
+  dfs_end_time = __HAL_TIM_GET_COUNTER(&htim7);
 
-  ff_start_time = HAL_GetTick();
+  ff_start_time = __HAL_TIM_GET_COUNTER(&htim7);
   flood_fill(&maze,&sim_maze);
-  ff_end_time = HAL_GetTick();
+  ff_end_time = __HAL_TIM_GET_COUNTER(&htim7);
 
-  dfs_time = dfs_end_time = dfs_start_time;
-  ff_time = ff_end_time = ff_start_time;
+  dfs_time = dfs_end_time - dfs_start_time;
+  ff_time = ff_end_time -ff_start_time;
 
   total_time = dfs_time+ff_time;
 

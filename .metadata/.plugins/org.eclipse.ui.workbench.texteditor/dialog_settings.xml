@@ -3,6 +3,8 @@
 	<item key="hasShownOverlayPopupBefore" value="true"/>
 	<item key="replaceBarOpen" value="true"/>
 	<list key="searchhistory">
+		<item value="define"/>
+		<item value="tick"/>
 		<item value=".cost"/>
 		<item value="bfs_q_max_len"/>
 		<item value="to_prev_intersection"/>
@@ -16,8 +18,6 @@
 		<item value="true"/>
 		<item value="false"/>
 		<item value="dest"/>
-		<item value="API_wallRight()"/>
-		<item value="API_wallLeft()"/>
 	</list>
 	<list key="replacehistory">
 		<item value="1"/>
