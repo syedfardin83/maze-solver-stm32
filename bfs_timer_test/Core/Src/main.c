@@ -2434,16 +2434,16 @@ int main(void)
   Maze(&maze,7,7);
 
   HAL_TIM_Base_Start(&htim7);
-  dfs_start_time = HAL_GetTick();
+  dfs_start_time = __HAL_TIM_GET_COUNTER(&htim7);
   DFS_explore(&maze,&sim_maze);
-  dfs_end_time = HAL_GetTick();
+  dfs_end_time = __HAL_TIM_GET_COUNTER(&htim7);
 
-  ff_start_time = HAL_GetTick();
+  ff_start_time = __HAL_TIM_GET_COUNTER(&htim7);
   bfs_solve(&maze,&sim_maze);
-  ff_end_time = HAL_GetTick();
+  ff_end_time = __HAL_TIM_GET_COUNTER(&htim7);
 
-  dfs_time = dfs_end_time-dfs_start_time;
-  ff_time = ff_end_time-ff_start_time;
+  dfs_time = dfs_end_time - dfs_start_time;
+  ff_time = ff_end_time -ff_start_time;
 
   total_time = dfs_time+ff_time;
 
@@ -2651,7 +2651,7 @@ static void MX_TIM7_Init(void)
 
   /* USER CODE END TIM7_Init 1 */
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 0;
+  htim7.Init.Prescaler = 7999;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim7.Init.Period = 65535;
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
